@@ -4,7 +4,7 @@ import Header from './components/Header.jsx';
 import ProductList from './pages/ProductList.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import ComparePage from './pages/ComparePage.jsx';
-import './App.css';
+import ScheduleViewing from './pages/ScheduleViewing';
 
 function App() {
   return (
@@ -19,6 +19,7 @@ function App() {
           <Route path="/san-pham" element={<ProductList />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/so-sanh" element={<ComparePage />} />
+          <Route path="/schedule-viewing" element={<ScheduleViewing />} />
         </Routes>
       </div>
     </Router>
