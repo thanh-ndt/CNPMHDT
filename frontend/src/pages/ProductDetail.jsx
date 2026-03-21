@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import CompareModal from '../components/CompareModal';
-import axios from 'axios';
-import './ProductDetail.css';
-
-const formatPrice = (price) =>
-  new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
+import CompareModal from '../components/CompareModal.jsx';
+import { vehicleService } from '../services/vehicleService';
+import { priceFormatter } from '../utils/priceFormatter';
+import './css/ProductDetail.css';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -18,23 +16,20 @@ const ProductDetail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBike = async () => {
+    const loadBike = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/vehicles?page=1&limit=50`);
-        if (response.data.success) {
-          const found = response.data.data.find(v => (v._id || v.id).toString() === id);
-          if (found) {
-            setBike(found);
-            setFavCount(found.favoritesCount || 0);
-          }
+        const found = await vehicleService.fetchVehicleById(id);
+        if (found) {
+          setBike(found);
+          setFavCount(found.favoritesCount || 0);
         }
       } catch (error) {
-        console.error("Lỗi tải chi tiếtxe:", error);
+        console.error('Lỗi tải chi tiết xe:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchBike();
+    loadBike();
   }, [id]);
 
   if (loading) {
@@ -85,16 +80,16 @@ const ProductDetail = () => {
 
             <div className="detail-price-row">
               <span className="detail-price-label">Giá từ:</span>
-              <span className="detail-price">{bike.formattedPrice || formatPrice(bike.price)}</span>
+              <span className="detail-price text-danger fw-bold">{bike.price ? priceFormatter(bike.price) : (bike.formattedPrice || 'Liên hệ')}</span>
               <button
                 className={`fav-btn ${isFavorited ? 'fav-btn--active' : ''} ${heartAnim ? 'fav-btn--pulse' : ''}`}
                 title="Yêu thích"
                 onClick={async () => {
                   if (isFavorited) return;
                   try {
-                    const res = await axios.patch(`http://localhost:5000/api/vehicles/${bike._id || bike.id}/favorite`);
-                    if (res.data.success) {
-                      setFavCount(res.data.favoritesCount);
+                    const res = await vehicleService.toggleFavorite(bike._id || bike.id);
+                    if (res.success) {
+                      setFavCount(res.favoritesCount);
                       setIsFavorited(true);
                       setHeartAnim(true);
                       setTimeout(() => setHeartAnim(false), 600);

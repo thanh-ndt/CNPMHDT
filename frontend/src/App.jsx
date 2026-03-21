@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header/Header';
-import ProductList from './pages/ProductList';
-import ProductDetail from './pages/ProductDetail';
-import ComparePage from './pages/ComparePage';
+import Header from './components/Header.jsx';
+import ProductList from './pages/ProductList.jsx';
+import ProductDetail from './pages/ProductDetail.jsx';
+import ComparePage from './pages/ComparePage.jsx';
 import './App.css';
 
 function App() {

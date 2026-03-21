@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Header.css';
+import './css/Header.css';
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');

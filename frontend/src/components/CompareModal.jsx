@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './CompareModal.css';
+import { vehicleService } from '../services/vehicleService';
+import { priceFormatter } from '../utils/priceFormatter';
+import './css/CompareModal.css';
 
 const CompareModal = ({ currentBikeId, onClose, selectedIds, onConfirm }) => {
   const [vehicles, setVehicles] = useState([]);
@@ -11,12 +12,12 @@ const CompareModal = ({ currentBikeId, onClose, selectedIds, onConfirm }) => {
   const [activeTab, setActiveTab] = useState('Tất cả');
 
   useEffect(() => {
-    const fetchVehicles = async () => {
+    const fetchVehiclesData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/vehicles?limit=100');
-        if (res.data.success) {
+        const res = await vehicleService.fetchVehiclesData({ limit: 100 });
+        if (res.success) {
           // Lọc bỏ xe gốc
-          let data = res.data.data;
+          let data = res.data;
           if (currentBikeId) {
             data = data.filter(v => (v._id || v.id) !== currentBikeId);
           }
@@ -28,7 +29,7 @@ const CompareModal = ({ currentBikeId, onClose, selectedIds, onConfirm }) => {
         setLoading(false);
       }
     };
-    fetchVehicles();
+    fetchVehiclesData();
   }, [currentBikeId]);
 
   const tabs = ['Tất cả', 'Xe ga', 'Xe số', 'Xe thể thao', 'Phân khối lớn', 'Xe điện'];
@@ -105,7 +106,7 @@ const CompareModal = ({ currentBikeId, onClose, selectedIds, onConfirm }) => {
                     </div>
                     <div className="modal-product-info">
                       <h4>{bike.name}</h4>
-                      <p>Giá từ: {bike.formattedPrice}</p>
+                      <p>Giá từ: <span className="text-danger fw-bold">{bike.price ? priceFormatter(bike.price) : (bike.formattedPrice || 'Liên hệ')}</span></p>
                     </div>
                     
                     <div className={`modal-check ${isSelected ? 'checked' : ''}`}>
