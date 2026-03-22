@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import compareReducer from './compareSlice';
+import addressReducer from './addressSlice';
 
 export const store = configureStore({
   reducer: {
-    compare: compareReducer,
+    address: addressReducer,
+    // Thêm các reducers khác ở đây (userAuth, products, v.v...)
   },
 });
