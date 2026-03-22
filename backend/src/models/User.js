@@ -37,6 +37,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       sparse: true,
     },
+    // Xác thực email
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifyToken: {
+      type: String,
+    },
+    // Đặt lại mật khẩu
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
