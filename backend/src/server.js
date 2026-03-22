@@ -20,11 +20,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'API web bán xe máy đang hoạt động!' });
 });
 
-// TODO: Thêm các routes ở đây
-// app.use('/api/users', require('./routes/userRoutes'));
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/vehicles', require('./routes/vehicleRoutes'));
 // app.use('/api/orders', require('./routes/orderRoutes'));
-// ...
 
 const PORT = process.env.PORT || 5000;
 
