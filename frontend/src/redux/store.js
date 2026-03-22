@@ -7,6 +7,12 @@ const store = configureStore({
         auth: authReducer,
         address: addressReducer,
     },
+import compareReducer from './compareSlice';
+
+export const store = configureStore({
+  reducer: {
+    compare: compareReducer,
+  },
 });
 
 export default store;
