@@ -1,17 +1,26 @@
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
-  removeFromCart,
-  updateQuantity,
-  clearCart,
+  fetchCartAsync,
+  setCustomerEmail,
+  clearCartAsync,
+  removeFromCartAsync,
+  updateCartQuantityAsync,
+  selectCustomerEmail,
   selectCartItems,
   selectCartTotalPrice,
+  selectCartLoading,
+  selectCartError,
 } from '../redux'
 
 export default function CartPage() {
   const dispatch = useDispatch()
+  const customerEmail = useSelector(selectCustomerEmail)
   const items = useSelector(selectCartItems)
   const totalPrice = useSelector(selectCartTotalPrice)
+  const loading = useSelector(selectCartLoading)
+  const error = useSelector(selectCartError)
 
   const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN', {
@@ -19,6 +28,60 @@ export default function CartPage() {
       currency: 'VND',
       maximumFractionDigits: 0,
     }).format(price)
+
+  useEffect(() => {
+    if (!customerEmail) return
+    dispatch(fetchCartAsync(customerEmail))
+  }, [customerEmail, dispatch])
+
+  if (!customerEmail) {
+    return (
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-lg-6">
+            <div className="card border-0 shadow-sm">
+              <div className="card-body p-4">
+                <h1 className="h4 fw-bold mb-3">Giỏ hàng</h1>
+                <p className="text-muted mb-4">
+                  Để test giỏ hàng, vui lòng nhập <strong>email khách hàng</strong>. (Seed đang có sẵn các email mẫu.)
+                </p>
+                <label className="form-label small text-muted">Email khách hàng</label>
+                <input
+                  className="form-control"
+                  placeholder="Ví dụ: nguyenvana@gmail.com"
+                  value={customerEmail}
+                  onChange={(e) => dispatch(setCustomerEmail(e.target.value))}
+                />
+                <div className="mt-3 small text-secondary">
+                  Ví dụ seed: <br />
+                  <span className="fw-semibold">nguyenvana@gmail.com</span> <br />
+                  <span className="fw-semibold">tranthib@gmail.com</span> <br />
+                  <span className="fw-semibold">levanc@gmail.com</span>
+                </div>
+                <div className="mt-4">
+                  <Link to="/" className="btn btn-danger rounded-pill px-4 fw-bold">
+                    Quay lại trang chủ
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading && items.length === 0) {
+    return (
+      <div className="container py-5">
+        <div className="text-center py-5">
+          <div className="spinner-border text-danger" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (
@@ -38,11 +101,16 @@ export default function CartPage() {
   return (
     <div className="container py-4 py-md-5">
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <h1 className="h2 fw-bold mb-0">Giỏ hàng</h1>
-        <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => dispatch(clearCart())}>
+        <div>
+          <h1 className="h2 fw-bold mb-1">Giỏ hàng</h1>
+          <div className="text-muted small">Khách: {customerEmail}</div>
+        </div>
+        <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => dispatch(clearCartAsync(customerEmail))}>
           Xóa tất cả
         </button>
       </div>
+
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="row g-4">
         <div className="col-lg-8">
@@ -75,7 +143,8 @@ export default function CartPage() {
                             className="btn btn-outline-secondary"
                             onClick={() =>
                               dispatch(
-                                updateQuantity({
+                                updateCartQuantityAsync({
+                                  customerEmail,
                                   vehicleId: item.vehicleId,
                                   quantity: item.quantity - 1,
                                 })
@@ -84,18 +153,14 @@ export default function CartPage() {
                           >
                             −
                           </button>
-                          <input
-                            type="text"
-                            readOnly
-                            className="form-control text-center"
-                            value={item.quantity}
-                          />
+                          <input type="text" readOnly className="form-control text-center" value={item.quantity} />
                           <button
                             type="button"
                             className="btn btn-outline-secondary"
                             onClick={() =>
                               dispatch(
-                                updateQuantity({
+                                updateCartQuantityAsync({
+                                  customerEmail,
                                   vehicleId: item.vehicleId,
                                   quantity: item.quantity + 1,
                                 })
@@ -115,7 +180,14 @@ export default function CartPage() {
                           type="button"
                           className="btn btn-link text-danger p-0"
                           title="Xóa"
-                          onClick={() => dispatch(removeFromCart(item.vehicleId))}
+                          onClick={() =>
+                            dispatch(
+                              removeFromCartAsync({
+                                customerEmail,
+                                vehicleId: item.vehicleId,
+                              })
+                            )
+                          }
                         >
                           ✕
                         </button>

@@ -1,16 +1,29 @@
-import { useDispatch } from 'react-redux'
-import { addToCart } from '../redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToCartAsync, setCustomerEmail, selectCustomerEmail } from '../redux'
 
 export default function VehicleCard({ vehicle, formatPrice }) {
   const dispatch = useDispatch()
+  const customerEmail = useSelector(selectCustomerEmail)
 
   const imgUrl = vehicle.images?.[0]
     ? `https://placehold.co/400x260/1d3557/fff?text=${encodeURIComponent(vehicle.name?.slice(0, 20) || 'Xe')}`
     : `https://placehold.co/400x260/1d3557/fff?text=${encodeURIComponent(vehicle.brand?.name || '')}+${encodeURIComponent(vehicle.name?.slice(0, 15) || '')}`
 
-  const handleAddToCart = (e) => {
-    e.preventDefault()
-    dispatch(addToCart({ vehicle, quantity: 1 }))
+  const handleAddToCart = () => {
+    let email = customerEmail
+    if (!email) {
+      email = window.prompt('Nhập email khách hàng (seed):', 'nguyenvana@gmail.com')
+      if (!email) return
+      dispatch(setCustomerEmail(email))
+    }
+
+    dispatch(
+      addToCartAsync({
+        customerEmail: email,
+        vehicleId: vehicle._id,
+        quantity: 1,
+      }),
+    )
   }
 
   return (

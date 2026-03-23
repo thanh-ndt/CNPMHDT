@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Vehicle = require('../models/Vehicle');
 const Brand = require('../models/Brand');
+// Require để Mongoose đăng ký model cho populate
+require('../models/VehicleModel');
 
 // GET /api/vehicles - Lấy danh sách xe máy (có phân trang)
 router.get('/', async (req, res) => {
