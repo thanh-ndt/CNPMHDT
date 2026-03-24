@@ -14,40 +14,22 @@ const RegisterPage = () => {
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-    const handleDobChange = (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val.length > 8) val = val.slice(0, 8);
-
-        let formattedVal = val;
-        if (val.length >= 5) {
-            formattedVal = `${val.slice(0, 2)}/${val.slice(2, 4)}/${val.slice(4)}`;
-        } else if (val.length >= 3) {
-            formattedVal = `${val.slice(0, 2)}/${val.slice(2)}`;
-        }
-        setForm({ ...form, dob: formattedVal });
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(''); setSuccess('');
+        if (form.password.length < 8) {
+            return setError('Mật khẩu phải có ít nhất 8 ký tự.');
+        }
         if (form.password !== form.confirmPassword) {
             return setError('Mật khẩu xác nhận không khớp.');
         }
         setLoading(true);
         try {
-            let formattedDob = form.dob;
-            if (formattedDob) {
-                const parts = formattedDob.split('/');
-                if (parts.length === 3) {
-                    formattedDob = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                }
-            }
-
             const res = await registerApi({
                 fullName: form.fullName,
                 email: form.email,
                 phoneNumber: form.phoneNumber,
-                dob: formattedDob,
+                dob: form.dob,
                 password: form.password
             });
             setSuccess(res.data.message);
@@ -100,14 +82,14 @@ const RegisterPage = () => {
                             <label className="form-label fw-semibold small">Ngày sinh</label>
                             <div className="input-group">
                                 <span className="input-group-text bg-white border-end-0"><i className="bi bi-calendar text-muted"></i></span>
-                                <input type="text" name="dob" className="form-control border-start-0 ps-0" placeholder="DD/MM/YYYY" value={form.dob} onChange={handleDobChange} maxLength={10} />
+                                <input type="date" name="dob" className="form-control border-start-0 ps-0" value={form.dob} onChange={handleChange} />
                             </div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label fw-semibold small">Mật khẩu <span className="text-danger">*</span></label>
                             <div className="input-group">
                                 <span className="input-group-text bg-white border-end-0"><i className="bi bi-lock text-muted"></i></span>
-                                <input type={showPassword ? "text" : "password"} name="password" className="form-control border-start-0 border-end-0 ps-0" placeholder="Ít nhất 6 ký tự" value={form.password} onChange={handleChange} required />
+                                <input type={showPassword ? "text" : "password"} name="password" className="form-control border-start-0 border-end-0 ps-0" placeholder="Ít nhất 8 ký tự" value={form.password} onChange={handleChange} required minLength={8} />
                                 <button type="button" className="btn btn-outline-secondary border-start-0 bg-white" style={{ borderColor: '#dee2e6' }} onClick={() => setShowPassword(!showPassword)}>
                                     <i className={`bi bi-eye${showPassword ? '-slash' : ''} text-muted`}></i>
                                 </button>

@@ -1,20 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
-import addressReducer from './addressSlice';
 import authReducer from './authSlice';
 import addressReducer from './addressSlice';
+import cartReducer from './cartSlice';
+import vehicleReducer from './vehicleSlice';
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
         address: addressReducer,
+        cart: cartReducer,
+        vehicle: vehicleReducer,
     },
-import compareReducer from './compareSlice';
-
-export const store = configureStore({
-  reducer: {
-    address: addressReducer,
-    // Thêm các reducers khác ở đây (userAuth, products, v.v...)
-  },
 });
 
+export { store };
 export default store;
