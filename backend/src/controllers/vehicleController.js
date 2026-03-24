@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Vehicle = require('../models/Vehicle');
 const Brand = require('../models/Brand');
+const VehicleModel = require('../models/VehicleModel');
 
 const getVehicles = async (req, res) => {
   try {
@@ -151,8 +152,37 @@ const toggleFavorite = async (req, res) => {
   }
 };
 
+// Lấy chi tiết 1 xe theo ID
+const getVehicleById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'ID sản phẩm không hợp lệ' });
+    }
+
+    const vehicle = await Vehicle.findById(id)
+      .populate('brand', 'name')
+      .populate('vehicleModel', 'name');
+
+    if (!vehicle) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy xe' });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: vehicle.toJSON() // toJSON gọi virtuals (để lấy formattedPrice)
+    });
+  } catch (error) {
+    console.error('Lỗi khi lấy chi tiết xe:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
 module.exports = {
   getVehicles,
+  getVehicleById,
   getSuggestions,
   toggleFavorite,
 };

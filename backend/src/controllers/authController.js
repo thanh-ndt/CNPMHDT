@@ -44,7 +44,8 @@ const register = async (req, res) => {
         });
 
         // Gửi email xác thực
-        const verifyUrl = `${process.env.CLIENT_URL}/verify-email/${emailVerifyToken}`;
+        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
+        const verifyUrl = `${clientUrl}/verify-email/${emailVerifyToken}`;
         await sendEmail({
             to: email,
             subject: 'Xác thực tài khoản - Web Bán Xe Máy',
