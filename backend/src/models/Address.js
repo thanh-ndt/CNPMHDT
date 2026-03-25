@@ -17,6 +17,11 @@ const addressSchema = new mongoose.Schema(
       required: [true, 'Địa chỉ là bắt buộc'],
       trim: true,
     },
+    ghiChu: {
+      type: String,
+      trim: true,
+      default: '',
+    },
   },
   {
     timestamps: true,

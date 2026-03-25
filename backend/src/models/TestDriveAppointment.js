@@ -5,12 +5,15 @@ const testDriveAppointmentSchema = new mongoose.Schema(
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
     },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+    guestName: {
+      type: String,
+      trim: true,
+    },
+    guestPhone: {
+      type: String,
+      trim: true,
     },
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,

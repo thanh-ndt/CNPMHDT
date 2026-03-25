@@ -96,7 +96,7 @@ vehicleSchema.virtual('formattedPrice').get(function () {
 });
 
 // Middleware: normalize name before saving
-vehicleSchema.pre('save', function (next) {
+vehicleSchema.pre('save', function () {
   if (this.name) {
     // Trim extra spaces and capitalize the first letter of each word
     this.name = this.name
@@ -106,7 +106,6 @@ vehicleSchema.pre('save', function (next) {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
-  next();
 });
 
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);

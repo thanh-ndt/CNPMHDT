@@ -12,8 +12,8 @@ const {
 // POST /api/auth/register
 router.post('/register', register);
 
-// GET /api/auth/verify-email/:token
-router.get('/verify-email/:token', verifyEmail);
+// POST /api/auth/verify-email
+router.post('/verify-email', verifyEmail);
 
 // POST /api/auth/login
 router.post('/login', login);

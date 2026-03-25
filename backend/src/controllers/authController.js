@@ -32,7 +32,7 @@ const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const emailVerifyToken = crypto.randomBytes(32).toString('hex');
+        const emailVerifyToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 
         const user = await User.create({
             email,
@@ -44,22 +44,18 @@ const register = async (req, res) => {
         });
 
         // Gửi email xác thực
-        const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
-        const verifyUrl = `${clientUrl}/verify-email/${emailVerifyToken}`;
         await sendEmail({
             to: email,
-            subject: 'Xác thực tài khoản - Web Bán Xe Máy',
+            subject: 'Mã OTP xác thực tài khoản - Web Bán Xe Máy',
             html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #e74c3c;">Chào mừng đến với Web Bán Xe Máy!</h2>
           <p>Xin chào <strong>${fullName || email}</strong>,</p>
-          <p>Cảm ơn bạn đã đăng ký. Vui lòng nhấn nút bên dưới để xác thực địa chỉ email của bạn:</p>
-          <a href="${verifyUrl}" 
-             style="display: inline-block; padding: 12px 24px; background-color: #e74c3c; 
-                    color: white; text-decoration: none; border-radius: 5px; margin: 16px 0;">
-            Xác Thực Email
-          </a>
-          <p>Link này có hiệu lực trong 24 giờ.</p>
+          <p>Cảm ơn bạn đã đăng ký. Mã xác thực (OTP) của bạn là:</p>
+          <div style="font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 5px; margin: 24px 0; text-align: center; background: #feeff0; padding: 16px; border-radius: 8px;">
+            ${emailVerifyToken}
+          </div>
+          <p>Mã này có hiệu lực trong 24 giờ.</p>
           <p>Nếu bạn không đăng ký tài khoản, hãy bỏ qua email này.</p>
         </div>
       `,
@@ -75,15 +71,19 @@ const register = async (req, res) => {
 };
 
 // ========================
-// XÁC THỰC EMAIL
+// XÁC THỰC EMAIL BẰNG OTP
 // ========================
 const verifyEmail = async (req, res) => {
     try {
-        const { token } = req.params;
+        const { email, otp } = req.body;
 
-        const user = await User.findOne({ emailVerifyToken: token });
+        if (!email || !otp) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp email và mã OTP.' });
+        }
+
+        const user = await User.findOne({ email, emailVerifyToken: otp });
         if (!user) {
-            return res.status(400).json({ message: 'Link xác thực không hợp lệ hoặc đã hết hạn.' });
+            return res.status(400).json({ message: 'Mã OTP không hợp lệ hoặc đã hết hạn.' });
         }
 
         user.isEmailVerified = true;
