@@ -15,6 +15,19 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState('');
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(0);
+
+    // Mapping key specifications sang tiếng Việt có dấu
+    const specsLabelMap = {
+        'dong_co': 'Động cơ',
+        'cong_suat': 'Công suất',
+        'tieu_hao': 'Tiêu hao nhiên liệu',
+        'chieu_cao_yen': 'Chiều cao yên',
+        'binh_xang': 'Dung tích bình xăng',
+        'phan_h': 'Hệ thống phanh',
+        'cong_nghe': 'Công nghệ'
+    };
 
     const handleAddToCart = async () => {
         if (!customerEmail) {
@@ -30,6 +43,16 @@ export default function ProductDetailPage() {
         }
     };
 
+    const handleToggleLike = () => {
+        if (isLiked) {
+            setIsLiked(false);
+            setLikesCount(prev => prev - 1);
+        } else {
+            setIsLiked(true);
+            setLikesCount(prev => prev + 1);
+        }
+    };
+
     useEffect(() => {
         const fetchVehicle = async () => {
             setLoading(true);
@@ -37,6 +60,7 @@ export default function ProductDetailPage() {
                 const res = await vehicleService.getVehicleById(id);
                 if (res.success && res.data) {
                     setVehicle(res.data);
+                    setLikesCount(res.data.favoritesCount || 0);
                     if (res.data.images && res.data.images.length > 0) {
                         setActiveImage(res.data.images[0]);
                     }
@@ -157,10 +181,21 @@ export default function ProductDetailPage() {
                         >
                             <i className="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                         </button>
-                        <button className="btn btn-outline-danger shadow-sm btn-lg px-4 rounded-pill">
-                            <i className="bi bi-heart"></i>
+                        <button 
+                            className="btn btn-lg px-4 rounded-pill d-flex align-items-center gap-2" 
+                            style={{
+                                border: '2px solid #dc3545',
+                                backgroundColor: isLiked ? '#dc3545' : 'white',
+                                color: isLiked ? 'white' : '#dc3545',
+                                transition: 'all 0.3s'
+                            }}
+                            onClick={handleToggleLike}
+                        >
+                            <i className={`bi ${isLiked ? "bi-heart-fill" : "bi-heart"}`}></i>
+                            <span className="fw-semibold">{likesCount}</span>
                         </button>
                     </div>
+
 
                     {/* Thông số kỹ thuật */}
                     {vehicle.specifications && Object.keys(vehicle.specifications).length > 0 && (
@@ -170,8 +205,8 @@ export default function ProductDetailPage() {
                                 <tbody>
                                     {Object.entries(vehicle.specifications).map(([key, val]) => (
                                         <tr key={key}>
-                                            <th className="w-50 text-muted fw-normal">{key}</th>
-                                            <td className="fw-medium">{val}</td>
+                                            <th className="w-50 fw-bold text-dark" style={{ paddingLeft: '1rem' }}>{specsLabelMap[key] || key}</th>
+                                            <td className="fw-normal" style={{ paddingLeft: '1rem' }}>{val}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -183,3 +218,4 @@ export default function ProductDetailPage() {
         </div>
     );
 }
+
