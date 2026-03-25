@@ -110,7 +110,7 @@ export default function VehicleCard({
             <div className="card-body d-flex flex-column">
                 <h5 className="card-title fw-bold mb-1">{v.name}</h5>
                 <p className="text-muted small mb-2">
-                    {v.vehicleModel?.name || v.category || ''} {v.manufacture ? `• ${v.manufacture}` : ''}
+                    {v.vehicleModel?.name || ''} {v.manufacture ? `• ${v.manufacture}` : ''}
                 </p>
                 {v.category && (
                     <span className="badge bg-secondary bg-opacity-10 text-secondary mb-2 align-self-start">
