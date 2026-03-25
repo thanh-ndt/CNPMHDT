@@ -5,11 +5,12 @@ import { addAddress, resetAddressState } from '../redux/addressSlice';
 // import { useNavigate } from 'react-router-dom';
 
 const AddAddress = () => {
+  const { user } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     phone: '',
     diaChi: '',
     ghiChu: '',
-    customer: 'test-user-id' // Cần thay đổi ID thực tế của user đã đăng nhập
   });
 
   const dispatch = useDispatch();
@@ -33,7 +34,11 @@ const AddAddress = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(addAddress(formData));
+    if (!user?._id) {
+      alert('Vui lòng đăng nhập để lưu địa chỉ.');
+      return;
+    }
+    dispatch(addAddress({ ...formData, customer: user._id }));
   };
 
 

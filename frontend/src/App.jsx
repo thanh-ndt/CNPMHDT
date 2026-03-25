@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PrivateRoute from './components/PrivateRoute';
 import AppLayout from './components/AppLayout';
+import ChatWidget from './components/ChatWidget';
 
 // Auth pages (no Header)
 import LoginPage from './pages/LoginPage';
@@ -28,9 +29,10 @@ const App = () => {
 
     return (
         <BrowserRouter>
+            <ChatWidget />
             <Routes>
                 {/* ─── Public auth routes (NO Header) ─── */}
-                <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 

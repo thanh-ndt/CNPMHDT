@@ -86,6 +86,8 @@ const Header = () => {
                         <Link to="/" className={`hdr-nav-item ${location.pathname === '/' ? 'hdr-nav-active' : ''}`}>Trang chủ</Link>
                         <Link to="/products" className={`hdr-nav-item ${location.pathname === '/products' || location.pathname.startsWith('/product/') ? 'hdr-nav-active' : ''}`}>Sản phẩm</Link>
                         <Link to="/promotions" className={`hdr-nav-item ${location.pathname === '/promotions' ? 'hdr-nav-active' : ''}`}>Khuyến mãi</Link>
+                        <Link to="/schedule-viewing" className={`hdr-nav-item ${location.pathname === '/schedule-viewing' ? 'hdr-nav-active' : ''}`}>Đặt lịch xem xe</Link>
+                        <Link to="/cart" className={`hdr-nav-item ${location.pathname === '/cart' ? 'hdr-nav-active' : ''}`}>Giỏ hàng</Link>
                     </nav>
 
                     {/* Thanh tìm kiếm */}

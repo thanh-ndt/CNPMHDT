@@ -43,23 +43,7 @@ export default function HomePage() {
                         <h2 className="display-5 fw-bold mb-2">Xe máy nổi bật</h2>
                         <p className="text-muted">Khám phá những mẫu xe máy hot nhất hiện nay</p>
                     </div>
-                    <div className="mb-4 d-flex flex-wrap gap-2 justify-content-center">
-                        <button
-                            className={`btn ${!selectedModel ? 'btn-danger' : 'btn-outline-danger'} rounded-pill px-4`}
-                            onClick={() => handleModelFilter('')}
-                        >
-                            Tất cả
-                        </button>
-                        {models.map((m) => (
-                            <button
-                                key={m._id || m.name}
-                                className={`btn ${selectedModel === (m._id || m.name) ? 'btn-danger' : 'btn-outline-danger'} rounded-pill px-4`}
-                                onClick={() => handleModelFilter(m._id || m.name)}
-                            >
-                                {m.name}
-                            </button>
-                        ))}
-                    </div>
+
                     {loading ? (
                         <div className="text-center py-5">
                             <div className="spinner-border text-danger" role="status">
@@ -77,23 +61,7 @@ export default function HomePage() {
                     )}
                 </div>
             </section>
-            <section className="py-5" id="thuong-hieu">
-                <div className="container">
-                    <div className="text-center mb-5">
-                        <h2 className="display-5 fw-bold mb-2">Các dòng xe máy</h2>
-                        <p className="text-muted">Xe số, xe tay ga, xe côn tay - Đầy đủ phân khúc</p>
-                    </div>
-                    <div className="row g-3 justify-content-center">
-                        {models.map((m) => (
-                            <div key={m._id || m.name} className="col-6 col-md-4 col-lg-2">
-                                <div className="card h-100 border-0 shadow-sm text-center py-4 px-3">
-                                    <span className="fw-bold text-secondary">{m.name}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+
             <section className="py-5 text-white" style={{ backgroundColor: '#e3002b' }}>
                 <div className="container text-center">
                     <h2 className="display-6 fw-bold mb-3">Ưu đãi đặc biệt hôm nay</h2>

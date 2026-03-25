@@ -1,15 +1,16 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { priceFormatter } from '../utils/priceFormatter';
 
 /**
  * VehicleCard — supports two usage patterns:
  *   1. HomePage style:   <VehicleCard vehicle={v} formatPrice={fn} />
- *   2. ProductGrid style: <VehicleCard bike={b} isCompareMode isSelected isDimmed isBlocked toggleCompare={fn} />
+ *   2. ProductGrid style: <VehicleCard bike={b} isCompareMode isSelected isDimmed isBlocked toggleCompare={fn} onAddToCart={fn} />
  */
 export default function VehicleCard({
     vehicle, formatPrice,                                       // HomePage props
-    bike, isCompareMode, isSelected, isDimmed, isBlocked, toggleCompare // ProductGrid props
+    bike, isCompareMode, isSelected, isDimmed, isBlocked, toggleCompare, onAddToCart // ProductGrid props
 }) {
+    const navigate = useNavigate();
     const v = vehicle || bike;
     if (!v) return null;
 
@@ -28,6 +29,7 @@ export default function VehicleCard({
         opacity: isDimmed ? 0.45 : 1,
         pointerEvents: isBlocked ? 'none' : 'auto',
         transition: 'all 0.3s',
+        cursor: 'pointer',
     };
 
     const handleCompareClick = (e) => {
@@ -36,10 +38,38 @@ export default function VehicleCard({
         if (toggleCompare) toggleCompare();
     };
 
+    const handleCardClick = () => {
+        navigate(`/product/${id}`);
+    };
+
+    const handleBuyNow = (e) => {
+        e.stopPropagation();
+        navigate('/checkout', {
+            state: {
+                selectedItems: [{
+                    vehicleId: id,
+                    name: v.name,
+                    price: v.price,
+                    quantity: 1,
+                    brandName: v.brand?.name || 'Honda',
+                    vehicleModelName: v.vehicleModel?.name || '',
+                    manufacture: v.manufacture,
+                    images: v.images || [],
+                }]
+            }
+        });
+    };
+
+    const handleAddToCartClick = (e) => {
+        e.stopPropagation();
+        if (onAddToCart) onAddToCart(id);
+    };
+
     return (
         <div
             className={`card h-100 border-0 shadow-sm overflow-hidden w-100 ${isSelected ? 'border-danger border-2' : ''}`}
             style={cardStyle}
+            onClick={handleCardClick}
         >
             <div className="position-relative">
                 <img
@@ -91,12 +121,13 @@ export default function VehicleCard({
                     {displayPrice}
                 </p>
                 <div className="d-flex gap-2">
-                    <Link
-                        to={`/product/${id}`}
+                    <button
+                        type="button"
                         className="btn btn-outline-danger btn-sm rounded-pill flex-fill"
+                        onClick={handleBuyNow}
                     >
-                        Chi tiết
-                    </Link>
+                        Mua ngay
+                    </button>
                     {isCompareMode ? (
                         <button
                             type="button"
@@ -109,6 +140,7 @@ export default function VehicleCard({
                         <button
                             type="button"
                             className="btn btn-danger btn-sm rounded-pill flex-fill"
+                            onClick={handleAddToCartClick}
                         >
                             Thêm vào giỏ
                         </button>

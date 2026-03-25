@@ -1,14 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { vehicleService } from '../services/vehicleService';
 import { priceFormatter } from '../utils/priceFormatter';
+import { addToCartAsync } from '../redux/cartSlice';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+    const customerEmail = user?.email;
     const [vehicle, setVehicle] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState('');
+
+    const handleAddToCart = async () => {
+        if (!customerEmail) {
+            alert('Vui lòng đăng nhập hoặc đăng ký để bỏ sản phẩm vào giỏ hàng.');
+            navigate('/login');
+            return;
+        }
+        try {
+            await dispatch(addToCartAsync({ customerEmail, vehicleId: vehicle._id || id, quantity: 1 })).unwrap();
+            alert('Đã thêm sản phẩm vào giỏ hàng!');
+        } catch (err) {
+            alert(err || 'Có lỗi xảy ra khi thêm vào giỏ hàng.');
+        }
+    };
 
     useEffect(() => {
         const fetchVehicle = async () => {
@@ -133,6 +153,7 @@ export default function ProductDetailPage() {
                         <button 
                             className="btn btn-danger btn-lg flex-grow-1 rounded-pill fw-bold"
                             disabled={vehicle.status !== 'available'}
+                            onClick={handleAddToCart}
                         >
                             <i className="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                         </button>

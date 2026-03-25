@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { vehicleService } from '../services/vehicleService';
+import { addToCartAsync } from '../redux/cartSlice';
 
 import FilterSidebar from '../components/FilterSidebar';
 import ProductGrid from '../components/ProductGrid';
@@ -12,6 +14,9 @@ const AVAILABLE_CATEGORIES = ['Xe ga', 'Xe số', 'Xe thể thao', 'Phân khối
 export default function ProductListPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.auth);
+    const customerEmail = user?.email;
 
     // Data
     const [vehicles, setVehicles] = useState([]);
@@ -102,6 +107,20 @@ export default function ProductListPage() {
         navigate(`/compare?ids=${ids}`);
     };
 
+    const handleAddToCart = async (vehicleId) => {
+        if (!customerEmail) {
+            alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');
+            navigate('/login');
+            return;
+        }
+        try {
+            await dispatch(addToCartAsync({ customerEmail, vehicleId, quantity: 1 })).unwrap();
+            alert('Đã thêm sản phẩm vào giỏ hàng!');
+        } catch (err) {
+            alert(err || 'Có lỗi xảy ra khi thêm vào giỏ hàng.');
+        }
+    };
+
     return (
         <>
             <Container fluid className="py-4 px-3 px-lg-5">
@@ -147,6 +166,7 @@ export default function ProductListPage() {
                             currentPage={pagination.currentPage}
                             totalPages={pagination.totalPages}
                             handlePageChange={handlePageChange}
+                            onAddToCart={handleAddToCart}
                         />
                     </Col>
                 </Row>

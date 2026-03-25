@@ -4,7 +4,7 @@ import VehicleCard from './VehicleCard';
 
 const ProductGrid = ({
     vehicles, loading, isCompareMode, compareIds, toggleCompare,
-    currentPage, totalPages, handlePageChange
+    currentPage, totalPages, handlePageChange, onAddToCart
 }) => {
     if (loading) {
         return (
@@ -42,6 +42,7 @@ const ProductGrid = ({
                                 isDimmed={isDimmed}
                                 isBlocked={isBlocked}
                                 toggleCompare={() => toggleCompare({ id, image: bike.images?.[0] })}
+                                onAddToCart={onAddToCart}
                             />
                         </Col>
                     );
