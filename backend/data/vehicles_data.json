@@ -8,7 +8,7 @@
     "images": [
       "/images/honda_vision.png"
     ],
-    "description": "Mẫu xe ga quốc dân với thiết kế nhỏ gọn, thanh lịch. Trang bị động cơ eSP thông minh và khung eSAF thế hệ mới.",
+    "description": "Honda Vision là mẫu xe tay ga quốc dân mang đậm phong cách thanh lịch, nhỏ gọn và linh hoạt, cực kỳ phù hợp cho việc di chuyển hàng ngày trong đô thị.\n\nKhung dập hàn la-de eSAF thế hệ mới giúp giảm trọng lượng xe, mang lại tư thế lái thoải mái và dễ dàng xoay sở. Khối động cơ eSP thông minh không chỉ cung cấp khả năng tăng tốc mượt mà mà còn tối ưu hóa lượng nhiên liệu tiêu thụ, giúp bạn tiết kiệm chi phí tối đa trên mọi hành trình.",
     "specifications": {
       "dong_co": "eSP, 110cc",
       "cong_suat": "6.59 kW",
@@ -48,7 +48,7 @@
     "images": [
       "/images/honda_winner_x.png"
     ],
-    "description": "Sát thủ côn tay đường phố với thiết kế khí động học mạnh mẽ, trang bị xích có phớt và phanh ABS an toàn.",
+    "description": "Honda Winner X là dòng xe côn tay thể thao mang đậm chất đường phố, sở hữu thiết kế khí động học sắc nét và tư thế lái hiếu chiến.\n\nĐược trang bị khối động cơ DOHC 150cc mạnh mẽ, xe mang lại khả năng bứt tốc ấn tượng và vận hành ổn định ở dải tốc độ cao. Cùng với hệ thống phanh ABS chống bó cứng an toàn và xích có phớt O-ring bền bỉ, Winner X sẵn sàng chinh phục mọi thử thách.",
     "specifications": {
       "dong_co": "DOHC, 150cc",
       "cong_suat": "11.5 kW",
@@ -108,7 +108,7 @@
     "images": [
       "/images/honda_sh_125i.png"
     ],
-    "description": "Biểu tượng sang trọng, trang bị đèn LED, đồng hồ LCD kết nối Bluetooth và phanh ABS.",
+    "description": "Honda SH 125i luôn khẳng định vị thế là biểu tượng của sự sang trọng và đẳng cấp trong phân khúc xe tay ga cao cấp tại Việt Nam.\n\nThiết kế liền mạch từ đầu đến đuôi xe kết hợp hệ thống đèn LED toàn phần tạo nên diện mạo bề thế, đầy lôi cuốn. Khối động cơ eSP+ 4 van thế hệ mới mang đến sức mạnh vượt trội, kết hợp cùng hệ thống phanh ABS an toàn, giúp người lái tự tin làm chủ mọi cung đường.",
     "specifications": {
       "dong_co": "eSP+, 125cc",
       "cong_suat": "9.6 kW",
@@ -428,7 +428,7 @@
     "images": [
       "/images/vespa_sprint_125.png"
     ],
-    "description": "Phong cách Ý lịch lãm, thân xe thép nguyên khối, đèn pha vuông cá tính và động cơ i-Get.",
+    "description": "Vespa Sprint 125 kế thừa di sản thiết kế Ý vượt thời gian với thân xe bằng thép nguyên khối và cụm đèn pha chữ nhật cá tính đầy mạnh mẽ.\n\nMẫu xe này là sự kết tinh hoàn hảo giữa nét đẹp cổ điển và công nghệ hiện đại, hướng đến những cá tính trẻ trung, yêu thích sự tự do. Khối động cơ i-Get tiên tiến hoạt động cực kỳ êm ái, giảm thiểu tiếng ồn và tiết kiệm nhiên liệu, mang lại cảm giác lướt đi nhẹ nhàng trên phố.",
     "specifications": {
       "dong_co": "i-Get, 125cc",
       "cong_suat": "7.9 kW",
@@ -508,7 +508,7 @@
     "images": [
       "/images/vinfast_theon_s.png"
     ],
-    "description": "Xe điện thông minh mạnh mẽ nhất, tốc độ 99km/h, quãng đường 150km mỗi lần sạc.",
+    "description": "VinFast Theon S là mẫu xe máy điện thông minh cao cấp nhất, định hình lại tương lai của phương tiện di chuyển xanh tại Việt Nam.\n\nSở hữu thiết kế góc cạnh, thể thao cùng hệ thống động cơ đặt giữa truyền động bằng dây đai, xe mang đến cảm giác lái phấn khích với tốc độ tối đa lên tới 99km/h. Cùng với hệ thống pin LFP tiên tiến cho quãng đường di chuyển 150km mỗi lần sạc và công nghệ kết nối thông minh, Theon S xứng đáng là lựa chọn hoàn hảo cho giới tinh hoa.",
     "specifications": {
       "dong_co": "Điện 7100W",
       "cong_suat": "9.5 HP",

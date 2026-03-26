@@ -144,6 +144,21 @@ export default function ProductDetailPage() {
                             ))}
                         </div>
                     )}
+
+                    {/* Mô tả sản phẩm chi tiết */}
+                    <div className="mt-5">
+                        <h4 className="fw-bold mb-3 border-bottom pb-2">Mô tả sản phẩm</h4>
+                        <div 
+                            className="text-dark" 
+                            style={{ 
+                                whiteSpace: 'pre-line', 
+                                textAlign: 'justify', 
+                                lineHeight: '1.6'
+                            }}
+                        >
+                            {vehicle.description || 'Chưa có thông tin mô tả chi tiết cho sản phẩm này.'}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Thông tin sản phẩm */}
@@ -171,10 +186,6 @@ export default function ProductDetailPage() {
                     <h2 className="text-danger fw-bold display-6 mb-4">
                         {vehicle.formattedPrice || priceFormatter(vehicle.price)}
                     </h2>
-
-                    <p className="text-muted lh-lg mb-4">
-                        {vehicle.description || 'Chưa có thông tin mô tả chi tiết cho sản phẩm này.'}
-                    </p>
 
                     {/* Quantity & Actions */}
                     <div className="d-flex gap-3 mb-5">
