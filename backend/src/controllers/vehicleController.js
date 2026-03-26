@@ -63,6 +63,7 @@ const getVehicles = async (req, res) => {
     // ── Aggregation Pipeline ───────────────────────────────────
     const pipeline = [
       { $match: matchStage },
+      { $sort: { soldCount: -1 } },
       {
         $facet: {
           metadata: [{ $count: 'total' }],
@@ -186,4 +187,3 @@ module.exports = {
   getSuggestions,
   toggleFavorite,
 };
-

@@ -6,7 +6,7 @@ import {
     selectModels,
     selectLoading,
     selectSelectedModel,
-    selectFilteredVehicles,
+    selectVehicles,
 } from '../redux/vehicleSlice'
 import VehicleCard from '../components/VehicleCard'
 import HeroSection from '../components/HeroSection'
@@ -16,10 +16,10 @@ export default function HomePage() {
     const models = useSelector(selectModels)
     const loading = useSelector(selectLoading)
     const selectedModel = useSelector(selectSelectedModel)
-    const filteredVehicles = useSelector(selectFilteredVehicles)
+    const featuredVehicles = useSelector(selectVehicles)
 
     useEffect(() => {
-        dispatch(fetchVehicles())
+        dispatch(fetchVehicles({ page: 1, limit: 8 }))
     }, [dispatch])
 
     const handleModelFilter = (modelId) => {
@@ -52,7 +52,7 @@ export default function HomePage() {
                         </div>
                     ) : (
                         <div className="row g-4">
-                            {filteredVehicles.map((v) => (
+                            {featuredVehicles.map((v) => (
                                 <div key={v._id} className="col-sm-6 col-lg-4 col-xl-3">
                                     <VehicleCard vehicle={v} formatPrice={formatPrice} />
                                 </div>

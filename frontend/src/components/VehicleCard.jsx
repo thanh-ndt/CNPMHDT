@@ -110,16 +110,35 @@ export default function VehicleCard({
             <div className="card-body d-flex flex-column">
                 <h5 className="card-title fw-bold mb-1">{v.name}</h5>
                 <p className="text-muted small mb-2">
-                    {v.vehicleModel?.name || v.category || ''} {v.manufacture ? `• ${v.manufacture}` : ''}
+                    {v.vehicleModel?.name || ''} {v.manufacture ? `• ${v.manufacture}` : ''}
                 </p>
-                {v.category && (
-                    <span className="badge bg-secondary bg-opacity-10 text-secondary mb-2 align-self-start">
-                        {v.category}
-                    </span>
-                )}
-                <p className="fw-bold text-danger mt-auto mb-2 fs-5">
-                    {displayPrice}
-                </p>
+                {/* Hàng ngang 1: Badge loại xe (trái) & Rating (phải) */}
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    {v.category && (
+                        <span className="badge bg-secondary bg-opacity-10 text-secondary">
+                            {v.category}
+                        </span>
+                    )}
+                    {v.rating && (
+                        <div className="d-flex align-items-center gap-1" style={{ fontSize: '0.85rem' }}>
+                            <span style={{ color: '#ffc107' }}>⭐</span>
+                            <span className="fw-semibold text-dark">{v.rating.toFixed(1)}</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Hàng ngang 2: Giá tiền (trái) & Đã bán (phải) */}
+                <div className="d-flex justify-content-between align-items-center mt-auto mb-2">
+                    <p className="fw-bold text-danger mb-0 fs-5">
+                        {displayPrice}
+                    </p>
+                    {v.soldCount !== undefined && v.soldCount > 0 && (
+                        <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+                            <span>Đã bán: </span>
+                            <span className="fw-semibold text-dark">{v.soldCount}</span>
+                        </div>
+                    )}
+                </div>
                 <div className="d-flex gap-2">
                     <button
                         type="button"

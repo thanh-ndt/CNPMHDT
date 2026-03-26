@@ -89,7 +89,7 @@ const seedData = async () => {
         images: [imageUrl],
         rating,
         soldCount,
-        favoritesCount: bike.favoritesCount || 0,
+        favoritesCount: Math.floor(Math.random() * 151) + 50, // 50-200
         numReviews: Math.floor(soldCount * 0.3), // ~30% người mua để lại đánh giá
       };
     });

@@ -3,9 +3,9 @@ import api from '../api/axiosConfig'
 
 export const fetchVehicles = createAsyncThunk(
     'vehicle/fetchVehicles',
-    async (_, { rejectWithValue }) => {
+    async (params, { rejectWithValue }) => {
         try {
-            const res = await api.get('/vehicles')
+            const res = await api.get('/vehicles', { params })
             return res.data
         } catch (err) {
             return rejectWithValue(err?.response?.data?.message || 'Lỗi khi tải danh sách xe')
@@ -70,6 +70,15 @@ export const selectFilteredVehicles = (state) => {
     return vehicles.filter(
         (v) => (v.vehicleModel?._id || v.vehicleModel?.name) === selectedModel,
     )
+}
+
+export const selectRelatedVehicles = (state, currentId, category) => {
+    if (!category) return [];
+    const vehicles = state.vehicle.vehicles || [];
+    return [...vehicles]
+        .filter((v) => v._id !== currentId && v.category === category)
+        .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
+        .slice(0, 4);
 }
 
 export default vehicleSlice.reducer

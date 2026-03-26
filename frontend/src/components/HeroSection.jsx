@@ -24,12 +24,6 @@ export default function HeroSection() {
                             >
                                 Xem xe ngay
                             </a>
-                            <a
-                                href="#thuong-hieu"
-                                className="btn btn-outline-light btn-lg px-4 rounded-pill"
-                            >
-                                Các dòng xe
-                            </a>
                         </div>
                     </div>
                 </div>
