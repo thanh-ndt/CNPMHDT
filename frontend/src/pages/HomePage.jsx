@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     fetchVehicles,
@@ -6,6 +6,7 @@ import {
     selectModels,
     selectLoading,
     selectSelectedModel,
+    selectVehicles,
 } from '../redux/vehicleSlice'
 import VehicleCard from '../components/VehicleCard'
 import HeroSection from '../components/HeroSection'
@@ -15,25 +16,11 @@ export default function HomePage() {
     const models = useSelector(selectModels)
     const loading = useSelector(selectLoading)
     const selectedModel = useSelector(selectSelectedModel)
-    const allVehicles = useSelector((state) => state.vehicle.vehicles)
-    
-    // State cho 8 xe nổi bật
-    const [featuredVehicles, setFeaturedVehicles] = useState([])
+    const featuredVehicles = useSelector(selectVehicles)
 
     useEffect(() => {
-        dispatch(fetchVehicles({ limit: 50 }))
+        dispatch(fetchVehicles({ page: 1, limit: 8 }))
     }, [dispatch])
-
-    useEffect(() => {
-        if (allVehicles && allVehicles.length > 0) {
-            // Logic đơn giản: Lấy 8 xe bán chạy nhất
-            const topSelling = [...allVehicles]
-                .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
-                .slice(0, 8);
-            
-            setFeaturedVehicles(topSelling);
-        }
-    }, [allVehicles]);
 
     const handleModelFilter = (modelId) => {
         dispatch(setSelectedModel(modelId || ''))

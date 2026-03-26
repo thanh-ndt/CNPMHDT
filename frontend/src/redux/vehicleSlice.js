@@ -3,9 +3,9 @@ import api from '../api/axiosConfig'
 
 export const fetchVehicles = createAsyncThunk(
     'vehicle/fetchVehicles',
-    async (_, { rejectWithValue }) => {
+    async (params, { rejectWithValue }) => {
         try {
-            const res = await api.get('/vehicles')
+            const res = await api.get('/vehicles', { params })
             return res.data
         } catch (err) {
             return rejectWithValue(err?.response?.data?.message || 'Lỗi khi tải danh sách xe')
