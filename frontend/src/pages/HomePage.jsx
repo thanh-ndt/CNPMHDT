@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     fetchVehicles,
@@ -6,7 +6,6 @@ import {
     selectModels,
     selectLoading,
     selectSelectedModel,
-    selectFilteredVehicles,
 } from '../redux/vehicleSlice'
 import VehicleCard from '../components/VehicleCard'
 import HeroSection from '../components/HeroSection'
@@ -16,11 +15,25 @@ export default function HomePage() {
     const models = useSelector(selectModels)
     const loading = useSelector(selectLoading)
     const selectedModel = useSelector(selectSelectedModel)
-    const filteredVehicles = useSelector(selectFilteredVehicles)
+    const allVehicles = useSelector((state) => state.vehicle.vehicles)
+    
+    // State cho 8 xe nổi bật
+    const [featuredVehicles, setFeaturedVehicles] = useState([])
 
     useEffect(() => {
-        dispatch(fetchVehicles())
+        dispatch(fetchVehicles({ limit: 50 }))
     }, [dispatch])
+
+    useEffect(() => {
+        if (allVehicles && allVehicles.length > 0) {
+            // Logic đơn giản: Lấy 8 xe bán chạy nhất
+            const topSelling = [...allVehicles]
+                .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
+                .slice(0, 8);
+            
+            setFeaturedVehicles(topSelling);
+        }
+    }, [allVehicles]);
 
     const handleModelFilter = (modelId) => {
         dispatch(setSelectedModel(modelId || ''))
@@ -52,7 +65,7 @@ export default function HomePage() {
                         </div>
                     ) : (
                         <div className="row g-4">
-                            {filteredVehicles.map((v) => (
+                            {featuredVehicles.map((v) => (
                                 <div key={v._id} className="col-sm-6 col-lg-4 col-xl-3">
                                     <VehicleCard vehicle={v} formatPrice={formatPrice} />
                                 </div>
