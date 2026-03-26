@@ -5,6 +5,7 @@ import { vehicleService } from '../services/vehicleService';
 import { priceFormatter } from '../utils/priceFormatter';
 import { addToCartAsync } from '../redux/cartSlice';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import VehicleCard from '../components/VehicleCard';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -20,6 +21,7 @@ export default function ProductDetailPage() {
     // State cho tính năng yêu thích
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
+    const [relatedVehicles, setRelatedVehicles] = useState([]);
 
     // Mapping key specifications sang tiếng Việt có dấu
     const specsLabelMap = {
@@ -67,6 +69,26 @@ export default function ProductDetailPage() {
                     setVehicle(res.data);
                     // Init likes count
                     setLikesCount(res.data.favoritesCount || 0);
+
+                    // Fetch related vehicles
+                    try {
+                        // Tăng limit lên (ví dụ 20 hoặc 50) để đảm bảo lấy đủ các xe bán chạy trong cùng Category
+                        const relatedRes = await vehicleService.fetchVehiclesData({
+                            category: res.data.category,
+                            limit: 50 // Lấy nhiều hơn để lọc cho chuẩn
+                        });
+
+                        if (relatedRes.success && relatedRes.data) {
+                            const filtered = relatedRes.data
+                                .filter(item => item._id !== id) // Loại bỏ xe đang xem
+                                .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0)) // Sắp xếp theo số lượng bán giảm dần
+                                .slice(0, 4); // Chỉ lấy 4 ông top đầu sau khi đã sort
+                            
+                            setRelatedVehicles(filtered);
+                        }
+                    } catch (err) {
+                        console.error('Không thể tải sản phẩm gợi ý:', err);
+                    }
                     
                     if (res.data.images && res.data.images.length > 0) {
                         setActiveImage(res.data.images[0]);
@@ -232,6 +254,20 @@ export default function ProductDetailPage() {
                     )}
                 </div>
             </div>
+
+            {/* Section Có thể bạn sẽ thích */}
+            {relatedVehicles.length > 0 && (
+                <div className='mt-5 pt-5 border-top'>
+                    <h3 className='fw-bold mb-4'>Có thể bạn sẽ thích</h3>
+                    <div className='row g-4'>
+                        {relatedVehicles.map((item) => (
+                            <div key={item._id} className='col-md-3'>
+                                <VehicleCard vehicle={item} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
