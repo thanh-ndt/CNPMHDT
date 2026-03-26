@@ -72,4 +72,13 @@ export const selectFilteredVehicles = (state) => {
     )
 }
 
+export const selectRelatedVehicles = (state, currentId, category) => {
+    if (!category) return [];
+    const vehicles = state.vehicle.vehicles || [];
+    return [...vehicles]
+        .filter((v) => v._id !== currentId && v.category === category)
+        .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
+        .slice(0, 4);
+}
+
 export default vehicleSlice.reducer

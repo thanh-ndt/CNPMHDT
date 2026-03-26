@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { vehicleService } from '../services/vehicleService';
 import { priceFormatter } from '../utils/priceFormatter';
 import { addToCartAsync } from '../redux/cartSlice';
+import { fetchVehicles, selectRelatedVehicles } from '../redux/vehicleSlice';
+import { specsLabelMap } from '../utils/constants';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import VehicleCard from '../components/VehicleCard';
 
@@ -21,18 +23,8 @@ export default function ProductDetailPage() {
     // State cho tính năng yêu thích
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
-    const [relatedVehicles, setRelatedVehicles] = useState([]);
-
-    // Mapping key specifications sang tiếng Việt có dấu
-    const specsLabelMap = {
-        'dong_co': 'Động cơ',
-        'cong_suat': 'Công suất',
-        'tieu_hao': 'Tiêu hao nhiên liệu',
-        'chieu_cao_yen': 'Chiều cao yên',
-        'binh_xang': 'Dung tích bình xăng',
-        'phan_h': 'Hệ thống phanh',
-        'cong_nghe': 'Công nghệ'
-    };
+    
+    const relatedVehicles = useSelector((state) => selectRelatedVehicles(state, id, vehicle?.category));
 
     const handleAddToCart = async () => {
         if (!customerEmail) {
@@ -70,25 +62,8 @@ export default function ProductDetailPage() {
                     // Init likes count
                     setLikesCount(res.data.favoritesCount || 0);
 
-                    // Fetch related vehicles
-                    try {
-                        // Tăng limit lên (ví dụ 20 hoặc 50) để đảm bảo lấy đủ các xe bán chạy trong cùng Category
-                        const relatedRes = await vehicleService.fetchVehiclesData({
-                            category: res.data.category,
-                            limit: 50 // Lấy nhiều hơn để lọc cho chuẩn
-                        });
-
-                        if (relatedRes.success && relatedRes.data) {
-                            const filtered = relatedRes.data
-                                .filter(item => item._id !== id) // Loại bỏ xe đang xem
-                                .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0)) // Sắp xếp theo số lượng bán giảm dần
-                                .slice(0, 4); // Chỉ lấy 4 ông top đầu sau khi đã sort
-                            
-                            setRelatedVehicles(filtered);
-                        }
-                    } catch (err) {
-                        console.error('Không thể tải sản phẩm gợi ý:', err);
-                    }
+                    // Nạp danh sách xe cùng Category vào Redux Store để Selector xử lý
+                    dispatch(fetchVehicles({ category: res.data.category, limit: 50 }));
                     
                     if (res.data.images && res.data.images.length > 0) {
                         setActiveImage(res.data.images[0]);
@@ -106,7 +81,7 @@ export default function ProductDetailPage() {
         if (id) {
             fetchVehicle();
         }
-    }, [id]);
+    }, [id, dispatch]);
 
     if (loading) {
         return (
