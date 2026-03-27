@@ -117,4 +117,124 @@ const createOrder = async (req, res) => {
     }
 };
 
-module.exports = { createOrder };
+// ========================
+// LẤY DANH SÁCH ĐƠN HÀNG CỦA USER
+// ========================
+const getMyOrders = async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Thiếu email người dùng' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+        }
+
+        const orders = await Order.find({ customer: user._id }).sort({ orderDate: -1 });
+
+        // Phụ thuộc vào cách frontend muốn hiển thị (hiện tại mock đang cần: id, date, total, status, items)
+        // Lấy số lượng sản phẩm (items) bằng cách đếm OrderDetail
+        const ordersWithItemCount = await Promise.all(orders.map(async (order) => {
+            const details = await OrderDetail.find({ order: order._id });
+            const itemsCount = details.reduce((acc, curr) => acc + curr.quantity, 0);
+            
+            return {
+                id: order._id,
+                date: order.orderDate,
+                total: order.totalAmount,
+                status: order.status,
+                items: itemsCount
+            };
+        }));
+
+        res.status(200).json({ success: true, data: ordersWithItemCount });
+    } catch (error) {
+        console.error('Lỗi getMyOrders:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
+// ========================
+// LẤY CHI TIẾT 1 ĐƠN HÀNG
+// ========================
+const getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'ID đơn hàng không hợp lệ' });
+        }
+
+        const order = await Order.findById(id).populate('customer', 'fullName email phoneNumber');
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        const orderDetails = await OrderDetail.find({ order: id }).populate({
+            path: 'vehicle',
+            select: 'name images price category',
+            populate: { path: 'brand', select: 'name' }
+        });
+
+        const payment = await Payment.findOne({ order: id });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                order,
+                items: orderDetails,
+                payment
+            }
+        });
+    } catch (error) {
+        console.error('Lỗi getOrderById:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
+// ========================
+// HỦY ĐƠN HÀNG
+// ========================
+const cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'ID đơn hàng không hợp lệ' });
+        }
+
+        const order = await Order.findById(id);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        // Chỉ cho phép hủy khi đang pending hoặc confirmed
+        if (order.status !== 'pending' && order.status !== 'confirmed') {
+            return res.status(400).json({ success: false, message: 'Chỉ có thể hủy đơn hàng đang chờ xác nhận hoặc đã xác nhận' });
+        }
+
+        order.status = 'cancelled';
+        await order.save();
+
+        // Hoàn lại số lượng tồn kho cho các sản phẩm trong đơn hàng
+        const orderDetails = await OrderDetail.find({ order: id }).populate('vehicle');
+        for (const detail of orderDetails) {
+            if (detail.vehicle) {
+                detail.vehicle.stockQuantity += detail.quantity;
+                if (detail.vehicle.stockQuantity > 0 && detail.vehicle.status === 'out_of_stock') {
+                    detail.vehicle.status = 'available';
+                }
+                await detail.vehicle.save();
+            }
+        }
+
+        res.status(200).json({ success: true, message: 'Đã hủy đơn hàng và hoàn lại kho thành công' });
+    } catch (error) {
+        console.error('Lỗi cancelOrder:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server khi hủy đơn' });
+    }
+};
+
+module.exports = { createOrder, getMyOrders, getOrderById, cancelOrder };

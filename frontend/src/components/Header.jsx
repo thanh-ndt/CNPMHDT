@@ -1,25 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+import { logout } from '../redux/authSlice';
 import './css/Header.css';
 
 const Header = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
 
-    const { token } = useSelector((state) => state.auth);
+    const { token, user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
     const location = useLocation();
     const searchRef = useRef(null);
 
-    // Close dropdown if clicked outside
+    // Close dropdowns if clicked outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
+            }
+            if (!event.target.closest('.hdr-user-menu-container')) {
+                setShowUserMenu(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -60,6 +66,12 @@ const Header = () => {
         setSearchTerm(keyword);
         setShowDropdown(false);
         navigate(`/?search=${encodeURIComponent(keyword)}`);
+    };
+
+    const handleLogout = () => {
+        dispatch(logout());
+        setShowUserMenu(false);
+        navigate('/login');
     };
 
     return (
@@ -141,7 +153,7 @@ const Header = () => {
 
                     </div>
 
-                    {/* Nút Đăng nhập / Đăng ký */}
+                    {/* Nút Đăng nhập / Đăng ký hoặc User Menu */}
                     <div className="hdr-auth-buttons">
                         {!token ? (
                             <>
@@ -149,7 +161,51 @@ const Header = () => {
                                 <Link to="/register" className="hdr-auth-btn hdr-auth-register">Đăng ký</Link>
                             </>
                         ) : (
-                            <Link to="/profile" className="hdr-auth-btn hdr-auth-profile">Tài khoản</Link>
+                            <div className="hdr-user-menu-container" style={{ position: 'relative' }}>
+                                <div 
+                                    className="hdr-user-trigger" 
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#fff' }}
+                                >
+                                    <div style={{
+                                        width: '32px', height: '32px', borderRadius: '50%', background: '#cc0000', 
+                                        color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontWeight: 'bold', fontSize: '14px'
+                                    }}>
+                                        {user?.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <span style={{ fontSize: '14px', fontWeight: '500' }}>{user?.fullName?.split(' ').pop() || 'Tài khoản'}</span>
+                                    <i className="bi bi-chevron-down" style={{ fontSize: '12px', transition: 'transform 0.2s', transform: showUserMenu ? 'rotate(180deg)' : 'none' }}></i>
+                                </div>
+
+                                {showUserMenu && (
+                                    <div className="hdr-user-dropdown" style={{
+                                        position: 'absolute', top: 'calc(100% + 15px)', right: '0', background: '#fff',
+                                        borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', width: '220px',
+                                        overflow: 'hidden', zIndex: 1000, border: '1px solid #eee'
+                                    }}>
+                                        <div style={{ padding: '16px', borderBottom: '1px solid #f0f0f0', background: '#f8f9fa' }}>
+                                            <p style={{ margin: 0, fontWeight: '600', color: '#222', fontSize: '14px' }}>{user?.fullName || 'Người dùng'}</p>
+                                            <p style={{ margin: 0, color: '#666', fontSize: '12px', marginTop: '4px', wordBreak: 'break-all' }}>{user?.email}</p>
+                                        </div>
+                                        <div style={{ padding: '8px 0' }}>
+                                            <Link to="/profile" onClick={() => setShowUserMenu(false)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', color: '#444', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                                                <i className="bi bi-person"></i> Hồ sơ cá nhân
+                                            </Link>
+                                            <Link to="/orders" onClick={() => setShowUserMenu(false)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', color: '#444', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                                                <i className="bi bi-box-seam"></i> Đơn hàng của tôi
+                                            </Link>
+                                            <Link to="/favorites" onClick={() => setShowUserMenu(false)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', color: '#444', textDecoration: 'none', fontSize: '14px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#f5f5f5'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                                                <i className="bi bi-heart"></i> Sản phẩm yêu thích
+                                            </Link>
+                                            <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }}></div>
+                                            <div onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', color: '#dc3545', textDecoration: 'none', fontSize: '14px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#fff0f0'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                                                <i className="bi bi-box-arrow-right"></i> Đăng xuất
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

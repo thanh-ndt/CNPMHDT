@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { priceFormatter } from '../utils/priceFormatter';
+import { addToCartAsync } from '../redux/cartSlice';
 
 /**
  * VehicleCard — supports two usage patterns:
@@ -11,6 +13,8 @@ export default function VehicleCard({
     bike, isCompareMode, isSelected, isDimmed, isBlocked, toggleCompare, onAddToCart // ProductGrid props
 }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
     const v = vehicle || bike;
     if (!v) return null;
 
@@ -60,9 +64,24 @@ export default function VehicleCard({
         });
     };
 
-    const handleAddToCartClick = (e) => {
+    const handleAddToCartClick = async (e) => {
         e.stopPropagation();
-        if (onAddToCart) onAddToCart(id);
+        if (onAddToCart) {
+            onAddToCart(id);
+        } else {
+            if (!user?.email) {
+                alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');
+                navigate('/login');
+                return;
+            }
+            try {
+                await dispatch(addToCartAsync({ customerEmail: user.email, vehicleId: id, quantity: 1 })).unwrap();
+                alert('Đã thêm sản phẩm vào giỏ hàng!');
+            } catch (err) {
+                console.error(err);
+                alert(err || 'Có lỗi xảy ra khi thêm vào giỏ hàng.');
+            }
+        }
     };
 
     return (

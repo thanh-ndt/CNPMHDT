@@ -49,34 +49,50 @@ const getCart = async (req, res) => {
 const addItem = async (req, res) => {
     try {
         const { customerEmail, vehicleId, quantity = 1 } = req.body;
-        if (!customerEmail || !vehicleId) return res.status(400).json({ success: false, message: 'Thiếu thông tin' });
+        
+        if (!customerEmail || !vehicleId) {
+            return res.status(400).json({ success: false, message: 'Thiếu thông tin email hoặc ID xe' });
+        }
 
         const user = await User.findOne({ email: customerEmail });
-        if (!user) return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Tài khoản không tồn tại trên hệ thống' });
+        }
 
         const vehicle = await Vehicle.findById(vehicleId);
-        if (!vehicle) return res.status(404).json({ success: false, message: 'Sản phẩm không tồn tại' });
+        if (!vehicle) {
+            return res.status(404).json({ success: false, message: 'Sản phẩm không còn tồn tại' });
+        }
 
         let cart = await Cart.findOne({ customer: user._id });
         if (!cart) {
             cart = new Cart({ customer: user._id, items: [] });
         }
 
-        const itemIndex = cart.items.findIndex(item => item.vehicle.toString() === vehicleId);
+        // Đảm bảo so sánh string an toàn
+        const strVehicleId = vehicle._id.toString();
+        const itemIndex = cart.items.findIndex(item => {
+            if (!item || !item.vehicle) return false;
+            return item.vehicle.toString() === strVehicleId;
+        });
+
         if (itemIndex > -1) {
-            cart.items[itemIndex].quantity += quantity;
+            cart.items[itemIndex].quantity += Number(quantity);
         } else {
-            cart.items.push({ vehicle: vehicleId, quantity });
+            cart.items.push({ vehicle: vehicle._id, quantity: Number(quantity) });
         }
 
-        cart.totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+        // Lọc bỏ rác nếu có
+        cart.items = cart.items.filter(item => item && item.vehicle);
+        cart.totalItems = cart.items.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
+        
         await cart.save();
 
         const formattedCart = await formatCartResponse(cart);
         res.json({ success: true, data: formattedCart });
     } catch (error) {
-        console.error('Lỗi addItem:', error);
-        res.status(500).json({ success: false, message: 'Lỗi server' });
+        console.error('Lỗi nghiêm trọng tại addItem:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi thêm giỏ hàng', error: error.message });
     }
 };
 
