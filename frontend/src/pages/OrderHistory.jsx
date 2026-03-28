@@ -1,108 +1,143 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Table, Badge, Button, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Table, Badge, Button, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { orderApi } from '../api/orderApi';
 
 const OrderHistory = () => {
   const navigate = useNavigate();
+  const { user } = useSelector(state => state.auth);
+  
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Mock data cho danh sách đơn hàng
-  const orders = [
-    {
-      id: 'DH-20231015-01',
-      date: '15/10/2023 14:30',
-      total: 450000,
-      status: 'Đã giao',
-      items: 3,
-    },
-    {
-      id: 'DH-20231102-05',
-      date: '02/11/2023 09:15',
-      total: 1250000,
-      status: 'Đang vận chuyển',
-      items: 1,
-    },
-    {
-      id: 'DH-20231120-12',
-      date: '20/11/2023 16:45',
-      total: 300000,
-      status: 'Chờ xác nhận',
-      items: 2,
-    },
-    {
-      id: 'DH-20231125-08',
-      date: '25/11/2023 10:00',
-      total: 550000,
-      status: 'Đã hủy',
-      items: 4,
+  useEffect(() => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
     }
-  ];
+
+    const fetchOrders = async () => {
+      try {
+        const res = await orderApi.getMyOrders(user.email);
+        if (res.success) {
+          setOrders(res.data);
+        } else {
+          setError(res.message || 'Không thể lấy danh sách đơn hàng');
+        }
+      } catch (err) {
+        setError('Lỗi kết nối hoặc không thể tải dữ liệu');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
 
   const getStatusBadge = (status) => {
     switch (status) {
+      case 'delivered':
       case 'Đã giao':
-        return <Badge bg="success">Đã giao</Badge>;
+        return <Badge bg="success px-3 py-2 rounded-pill">Đã giao</Badge>;
+      case 'shipping':
       case 'Đang vận chuyển':
-        return <Badge bg="primary">Đang vận chuyển</Badge>;
+        return <Badge bg="primary px-3 py-2 rounded-pill">Đang vận chuyển</Badge>;
+      case 'pending':
       case 'Chờ xác nhận':
-        return <Badge bg="warning" text="dark">Chờ xác nhận</Badge>;
+        return <Badge bg="warning px-3 py-2 rounded-pill" text="dark">Chờ xác nhận</Badge>;
+      case 'cancelled':
       case 'Đã hủy':
-        return <Badge bg="danger">Đã hủy</Badge>;
+        return <Badge bg="danger px-3 py-2 rounded-pill">Đã hủy</Badge>;
       default:
-        return <Badge bg="secondary">{status}</Badge>;
+        return <Badge bg="secondary px-3 py-2 rounded-pill">{status === 'confirmed' ? 'Đã xác nhận' : status}</Badge>;
     }
   };
 
-  const handleReturnToCheckout = () => {
-    navigate('/checkout');
-  };
+  const handleReturnToCheckout = () => navigate('/checkout');
+
+  if (!user) {
+    return (
+      <Container className="my-5 text-center py-5">
+        <Alert variant="warning" className="d-inline-block px-5 shadow-sm">
+            <h4 className="mb-3">Vui lòng đăng nhập</h4>
+            <p className="mb-4">Bạn cần đăng nhập để xem lịch sử đơn hàng của mình.</p>
+            <Button variant="danger" className="rounded-pill px-4" onClick={() => navigate('/login')}>Đăng nhập ngay</Button>
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
-    <Container className="my-5">
-      <Row className="mb-4 align-items-center">
+    <Container className="my-5 py-3">
+      <Row className="mb-4 align-items-end">
         <Col>
-          <h2 className="mb-0">Danh sách đơn hàng đã đặt</h2>
+          <h2 className="mb-1 fw-bold"><i className="bi bi-box-seam me-2 text-danger"></i>Lịch sử đơn hàng</h2>
+          <p className="text-muted mb-0">Các đơn hàng bạn đã đặt trên hệ thống Honda Store</p>
         </Col>
-        <Col xs="auto">
-          <Button variant="outline-primary" onClick={handleReturnToCheckout}>
-            Quay lại trang Checkout
+        <Col xs="auto" className="d-none d-md-block">
+          <Button variant="outline-secondary" className="rounded-pill px-4" onClick={handleReturnToCheckout}>
+            Mua thêm xe khác
           </Button>
         </Col>
       </Row>
 
-      <Card className="shadow-sm">
+      <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
         <Card.Body className="p-0">
-          <Table responsive hover className="mb-0">
-            <thead className="bg-light">
-              <tr>
-                <th className="px-4 py-3">Mã đơn hàng</th>
-                <th className="px-4 py-3">Ngày đặt</th>
-                <th className="px-4 py-3 text-center">Số SP</th>
-                <th className="px-4 py-3 text-end">Tổng tiền</th>
-                <th className="px-4 py-3 text-center">Trạng thái</th>
-                <th className="px-4 py-3 text-center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.id} className="align-middle">
-                  <td className="px-4 py-3 fw-bold text-primary">{order.id}</td>
-                  <td className="px-4 py-3 text-muted">{order.date}</td>
-                  <td className="px-4 py-3 text-center">{order.items}</td>
-                  <td className="px-4 py-3 text-end text-danger fw-bold">
-                    {order.total.toLocaleString('vi-VN')} đ
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {getStatusBadge(order.status)}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Button variant="outline-secondary" size="sm">
-                      Xem chi tiết
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          {loading ? (
+             <div className="text-center py-5 my-5 text-danger">
+                 <Spinner animation="border" style={{ width: '3rem', height: '3rem' }} />
+                 <p className="mt-3 text-muted">Đang tải danh sách đơn hàng...</p>
+             </div>
+          ) : error ? (
+             <div className="p-5 text-danger text-center bg-light">
+                 <i className="bi bi-exclamation-triangle fs-1 mb-3"></i>
+                 <h5>{error}</h5>
+             </div>
+          ) : orders.length === 0 ? (
+             <div className="py-5 my-4 text-center text-muted">
+               <div className="display-1 mb-3 text-secondary opacity-50">📦</div>
+               <h4 className="fw-bold text-dark">Bạn chưa có đơn hàng nào</h4>
+               <p>Hãy dạo quanh cửa hàng và chọn cho mình chiếc xe ưng ý nhé.</p>
+               <Button variant="danger" className="mt-3 rounded-pill px-5 py-2 fw-bold" onClick={() => navigate('/')}>Tiếp tục mua sắm</Button>
+             </div>
+          ) : (
+             <Table responsive hover className="mb-0 align-middle">
+               <thead className="bg-light text-muted">
+                 <tr>
+                   <th className="px-4 py-3 border-0">Mã đơn hàng</th>
+                   <th className="px-4 py-3 border-0">Ngày đặt</th>
+                   <th className="px-4 py-3 text-center border-0">Số SP</th>
+                   <th className="px-4 py-3 text-end border-0">Tổng tiền</th>
+                   <th className="px-4 py-3 text-center border-0">Trạng thái</th>
+                   <th className="px-4 py-3 text-center border-0">Thao tác</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {orders.map((order) => (
+                   <tr key={order.id} className="transition-all" style={{ transition: 'background-color 0.2s' }} onMouseOver={e=>e.currentTarget.style.backgroundColor='#fdfdfd'} onMouseOut={e=>e.currentTarget.style.backgroundColor='transparent'}>
+                     <td className="px-4 py-4 fw-bold text-primary">{order.id}</td>
+                     <td className="px-4 py-4 text-muted">{new Date(order.date).toLocaleString('vi-VN')}</td>
+                     <td className="px-4 py-4 text-center">
+                        <Badge bg="light" text="dark" className="border py-1 px-2">{order.items}</Badge>
+                     </td>
+                     <td className="px-4 py-4 text-end text-danger fw-bold fs-6">
+                       {order.total.toLocaleString('vi-VN')} ₫
+                     </td>
+                     <td className="px-4 py-4 text-center">
+                       {getStatusBadge(order.status)}
+                     </td>
+                     <td className="px-4 py-4 text-center">
+                       <Button variant="outline-danger" className="rounded-pill px-3 py-1 fw-semibold" size="sm" onClick={() => navigate(`/order/${order.id}`)}>
+                         <i className="bi bi-eye me-1"></i> Chi tiết
+                       </Button>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </Table>
+          )}
         </Card.Body>
       </Card>
     </Container>

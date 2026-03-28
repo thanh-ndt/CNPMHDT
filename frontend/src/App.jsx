@@ -21,8 +21,10 @@ import CartPage from './pages/CartPage';
 import Checkout from './pages/Checkout';
 import AddAddress from './pages/AddAddress';
 import OrderHistory from './pages/OrderHistory';
+import OrderDetail from './pages/OrderDetail';
 import ScheduleViewing from './pages/ScheduleViewing';
 import ProfilePage from './pages/ProfilePage';
+import FavoritesPage from './pages/FavoritesPage';
 
 const App = () => {
     const { token } = useSelector((state) => state.auth);
@@ -39,8 +41,8 @@ const App = () => {
                 {/* ─── App routes (WITH Header via AppLayout) ─── */}
                 <Route element={<AppLayout />}>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/login" element={token ? <Navigate to="/profile" /> : <LoginPage />} />
-                    <Route path="/register" element={token ? <Navigate to="/profile" /> : <RegisterPage />} />
+                    <Route path="/login" element={token ? <Navigate to="/" /> : <LoginPage />} />
+                    <Route path="/register" element={token ? <Navigate to="/" /> : <RegisterPage />} />
                     <Route path="/products" element={<ProductListPage />} />
                     <Route path="/product/:id" element={<ProductDetailPage />} />
                     <Route path="/compare" element={<ComparePage />} />
@@ -48,8 +50,10 @@ const App = () => {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/add-address" element={<AddAddress />} />
                     <Route path="/orders" element={<OrderHistory />} />
+                    <Route path="/order/:id" element={<OrderDetail />} />
                     <Route path="/schedule-viewing" element={<ScheduleViewing />} />
                     <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+                    <Route path="/favorites" element={<FavoritesPage />} />
                 </Route>
 
                 {/* Default route */}

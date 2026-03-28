@@ -33,6 +33,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/addresses', require('./routes/addressRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
+app.use('/api/returns', require('./routes/returnRoutes'));
 
 // Setup Socket.IO Server
 setupSocket(server);

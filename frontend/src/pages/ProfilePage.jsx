@@ -125,13 +125,14 @@ const ProfilePage = () => {
                         <div className="profile-card sidebar-card h-100">
                             <div className="sidebar-header">
                                 <div className="profile-avatar mb-3">
-                                    {user?.fullName ? user.fullName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt="Avatar" className="avatar-img" />
+                                    ) : (
+                                        user?.fullName ? user.fullName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()
+                                    )}
                                 </div>
                                 <h4 className="profile-name">{user?.fullName || 'Chưa đặt tên'}</h4>
                                 <p className="profile-email">{user?.email}</p>
-                                <span className={`profile-role-badge ${user?.role === 'owner' ? 'role-owner' : 'role-customer'}`}>
-                                    {user?.role === 'owner' ? 'Chủ cửa hàng' : 'Khách hàng'}
-                                </span>
                             </div>
 
                             <hr className="sidebar-divider" />
@@ -139,12 +140,12 @@ const ProfilePage = () => {
                             <ul className="sidebar-menu">
                                 <li>
                                     <button className={`sidebar-btn ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>
-                                        <i className="bi bi-person me-3"></i> Thông tin cá nhân
+                                        Thông tin cá nhân
                                     </button>
                                 </li>
                                 <li>
                                     <button className={`sidebar-btn ${activeTab === 'password' ? 'active' : ''}`} onClick={() => setActiveTab('password')}>
-                                        <i className="bi bi-shield-lock me-3"></i> Đổi mật khẩu
+                                        Đổi mật khẩu
                                     </button>
                                 </li>
                             </ul>
@@ -152,8 +153,8 @@ const ProfilePage = () => {
                             <hr className="sidebar-divider" />
 
                             <div className="sidebar-footer">
-                                <button className="btn btn-outline-danger w-100 custom-logout-btn" onClick={handleLogout}>
-                                    <i className="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                <button className="btn-logout w-100" onClick={handleLogout}>
+                                    Đăng xuất
                                 </button>
                             </div>
                         </div>
@@ -177,39 +178,54 @@ const ProfilePage = () => {
                                             </div>
                                         )}
                                         <form onSubmit={handleUpdateProfile}>
-                                            <div className="row">
-                                                <div className="col-12 col-md-6 mb-4">
-                                                    <label className="form-label-custom">Họ và tên</label>
-                                                    <div className="custom-input-group">
-                                                        <span className="input-group-text"><i className="bi bi-person"></i></span>
-                                                        <input type="text" name="fullName" className="form-control" placeholder="Ví dụ: Nguyễn Văn A" value={profileForm.fullName} onChange={handleProfileChange} />
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-md-6 mb-4">
-                                                    <label className="form-label-custom">Số điện thoại</label>
-                                                    <div className="custom-input-group">
-                                                        <span className="input-group-text"><i className="bi bi-telephone"></i></span>
-                                                        <input type="tel" name="phoneNumber" className="form-control" placeholder="0901234567" value={profileForm.phoneNumber} onChange={handleProfileChange} />
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-md-6 mb-4">
-                                                    <label className="form-label-custom">Ngày sinh</label>
-                                                    <div className="custom-input-group">
-                                                        <span className="input-group-text"><i className="bi bi-calendar"></i></span>
-                                                        <input type="text" name="dob" className="form-control" placeholder="DD/MM/YYYY" value={profileForm.dob} onChange={handleDobChange} maxLength={10} />
-                                                    </div>
-                                                </div>
-                                                <div className="col-12 col-md-6 mb-4">
-                                                    <label className="form-label-custom">Đường dẫn Ảnh đại diện</label>
-                                                    <div className="custom-input-group">
-                                                        <span className="input-group-text"><i className="bi bi-image"></i></span>
-                                                        <input type="text" name="avatar" className="form-control" placeholder="https://..." value={profileForm.avatar} onChange={handleProfileChange} />
-                                                    </div>
-                                                </div>
+                                            <div className="mb-4">
+                                                <label className="form-label-custom">HỌ VÀ TÊN</label>
+                                                <input 
+                                                    type="text" 
+                                                    name="fullName" 
+                                                    className="form-control-custom" 
+                                                    placeholder="Nhập họ và tên" 
+                                                    value={profileForm.fullName} 
+                                                    onChange={handleProfileChange} 
+                                                />
                                             </div>
-                                            <div className="text-end mt-2">
-                                                <button type="submit" className="btn-gradient" disabled={loadingProfile}>
-                                                    {loadingProfile ? <><span className="spinner-border spinner-border-sm me-2"></span>Đang lưu...</> : 'Lưu Thay Đổi'}
+                                            <div className="mb-4">
+                                                <label className="form-label-custom">SỐ ĐIỆN THOẠI</label>
+                                                <input 
+                                                    type="tel" 
+                                                    name="phoneNumber" 
+                                                    className="form-control-custom" 
+                                                    placeholder="Nhập số điện thoại" 
+                                                    value={profileForm.phoneNumber} 
+                                                    onChange={handleProfileChange} 
+                                                />
+                                            </div>
+                                            <div className="mb-4">
+                                                <label className="form-label-custom">NGÀY SINH</label>
+                                                <input 
+                                                    type="text" 
+                                                    name="dob" 
+                                                    className="form-control-custom" 
+                                                    placeholder="DD/MM/YYYY" 
+                                                    value={profileForm.dob} 
+                                                    onChange={handleDobChange} 
+                                                    maxLength={10} 
+                                                />
+                                            </div>
+                                            <div className="mb-4">
+                                                <label className="form-label-custom">ĐƯỜNG DẪN ẢNH ĐẠI DIỆN</label>
+                                                <input 
+                                                    type="text" 
+                                                    name="avatar" 
+                                                    className="form-control-custom" 
+                                                    placeholder="Nhập URL ảnh đại diện" 
+                                                    value={profileForm.avatar} 
+                                                    onChange={handleProfileChange} 
+                                                />
+                                            </div>
+                                            <div className="text-end mt-4">
+                                                <button type="submit" className="btn-save-changes" disabled={loadingProfile}>
+                                                    {loadingProfile ? 'Đang lưu...' : 'Lưu Thay Đổi'}
                                                 </button>
                                             </div>
                                         </form>
@@ -232,7 +248,7 @@ const ProfilePage = () => {
                                         )}
                                         <form onSubmit={handleChangePassword}>
                                             <div className="mb-4">
-                                                <label className="form-label-custom">Mật khẩu hiện tại</label>
+                                                <label className="form-label-custom">MẬT KHẨU HIỆN TẠI</label>
                                                 <div className="custom-input-group">
                                                     <span className="input-group-text"><i className="bi bi-shield-lock"></i></span>
                                                     <input type={showCurrentPassword ? "text" : "password"} name="currentPassword" className="form-control" placeholder="Nhập để xác thực" value={passForm.currentPassword} onChange={handlePassChange} required />
@@ -242,7 +258,7 @@ const ProfilePage = () => {
                                                 </div>
                                             </div>
                                             <div className="mb-4">
-                                                <label className="form-label-custom">Mật khẩu mới</label>
+                                                <label className="form-label-custom">MẬT KHẨU MỚI</label>
                                                 <div className="custom-input-group">
                                                     <span className="input-group-text"><i className="bi bi-key"></i></span>
                                                     <input type={showNewPassword ? "text" : "password"} name="newPassword" className="form-control" placeholder="Ít nhất 6 ký tự" value={passForm.newPassword} onChange={handlePassChange} required />
@@ -252,7 +268,7 @@ const ProfilePage = () => {
                                                 </div>
                                             </div>
                                             <div className="mb-4">
-                                                <label className="form-label-custom">Xác nhận mật khẩu mới</label>
+                                                <label className="form-label-custom">XÁC NHẬN MẬT KHẨU MỚI</label>
                                                 <div className="custom-input-group">
                                                     <span className="input-group-text"><i className="bi bi-check-circle"></i></span>
                                                     <input type={showConfirmNewPassword ? "text" : "password"} name="confirmNewPassword" className="form-control" placeholder="Nhập lại mật khẩu mới" value={passForm.confirmNewPassword} onChange={handlePassChange} required />
@@ -262,7 +278,7 @@ const ProfilePage = () => {
                                                 </div>
                                             </div>
                                             <div className="text-end mt-2">
-                                                <button type="submit" className="btn-gradient" disabled={loadingPass}>
+                                                <button type="submit" className="btn-update-password" disabled={loadingPass}>
                                                     {loadingPass ? <><span className="spinner-border spinner-border-sm me-2"></span>Đang xử lý...</> : 'Cập Nhật Mật Khẩu'}
                                                 </button>
                                             </div>

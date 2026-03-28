@@ -44,6 +44,24 @@ const RegisterPage = () => {
         }
     };
 
+    // ── 3 dropdown Ngày / Tháng / Năm ──
+    const currentYear = new Date().getFullYear();
+    const [dobDay, setDobDay] = useState('');
+    const [dobMonth, setDobMonth] = useState('');
+    const [dobYear, setDobYear] = useState('');
+
+    const handleDobChange = (field, value) => {
+        let d = dobDay, m = dobMonth, y = dobYear;
+        if (field === 'day') { d = value; setDobDay(value); }
+        if (field === 'month') { m = value; setDobMonth(value); }
+        if (field === 'year') { y = value; setDobYear(value); }
+        const dobStr = (d && m && y) ? `${y}-${m}-${d}` : '';
+        setForm(prev => ({ ...prev, dob: dobStr }));
+    };
+
+    const getDaysInMonth = (m, y) => (m && y) ? new Date(Number(y), Number(m), 0).getDate() : 31;
+    const daysArr = Array.from({ length: getDaysInMonth(dobMonth, dobYear) }, (_, i) => i + 1);
+
     return (
         <div className="auth-wrapper">
             <div className="auth-card register-card">
@@ -81,13 +99,26 @@ const RegisterPage = () => {
                                 <input type="tel" name="phoneNumber" className="form-control border-start-0 ps-0" placeholder="0901234567" value={form.phoneNumber} onChange={handleChange} />
                             </div>
                         </div>
+
+                        {/* Ngày sinh: 3 dropdown Ngày / Tháng / Năm */}
                         <div className="mb-3">
                             <label className="form-label fw-semibold small">Ngày sinh</label>
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0"><i className="bi bi-calendar text-muted"></i></span>
-                                <input type="date" name="dob" className="form-control border-start-0 ps-0" value={form.dob} onChange={handleChange} />
+                            <div className="d-flex gap-2">
+                                <select className="form-select" value={dobDay} onChange={e => handleDobChange('day', e.target.value)}>
+                                    <option value="">Ngày</option>
+                                    {daysArr.map(d => <option key={d} value={String(d).padStart(2,'0')}>{d}</option>)}
+                                </select>
+                                <select className="form-select" value={dobMonth} onChange={e => handleDobChange('month', e.target.value)}>
+                                    <option value="">Tháng</option>
+                                    {Array.from({length:12},(_,i)=>i+1).map(m => <option key={m} value={String(m).padStart(2,'0')}>Tháng {m}</option>)}
+                                </select>
+                                <select className="form-select" value={dobYear} onChange={e => handleDobChange('year', e.target.value)}>
+                                    <option value="">Năm</option>
+                                    {Array.from({length:100},(_,i)=>currentYear-i).map(y => <option key={y} value={y}>{y}</option>)}
+                                </select>
                             </div>
                         </div>
+
                         <div className="mb-3">
                             <label className="form-label fw-semibold small">Mật khẩu <span className="text-danger">*</span></label>
                             <div className="input-group">

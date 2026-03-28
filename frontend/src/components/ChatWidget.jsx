@@ -24,8 +24,15 @@ const ChatWidget = () => {
         
         const newSocket = io('http://localhost:5000');
         setSocket(newSocket);
+
+        // Lắng nghe custom event từ các component khác để mở chat
+        const openChat = () => setIsOpen(true);
+        window.addEventListener('open-chat-widget', openChat);
         
-        return () => newSocket.close();
+        return () => {
+            newSocket.close();
+            window.removeEventListener('open-chat-widget', openChat);
+        };
     }, [user]);
 
     useEffect(() => {

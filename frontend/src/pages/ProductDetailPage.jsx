@@ -8,6 +8,7 @@ import { fetchVehicles, selectRelatedVehicles } from '../redux/vehicleSlice';
 import { specsLabelMap } from '../utils/constants';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import VehicleCard from '../components/VehicleCard';
+import { isFavorite, toggleFavorite } from './FavoritesPage';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -20,7 +21,7 @@ export default function ProductDetailPage() {
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState('');
     
-    // State cho tính năng yêu thích
+    // State cho tính năng yêu thích - đồng bộ với localStorage
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
     
@@ -41,15 +42,10 @@ export default function ProductDetailPage() {
     };
 
     const handleToggleLike = () => {
-        // Toggle local state
-        if (isLiked) {
-            setIsLiked(false);
-            setLikesCount(prev => Math.max(0, prev - 1));
-        } else {
-            setIsLiked(true);
-            setLikesCount(prev => prev + 1);
-        }
-        // TODO: Call API to update status if needed
+        const newFavs = toggleFavorite(id);
+        const liked = newFavs.includes(id);
+        setIsLiked(liked);
+        setLikesCount(prev => liked ? prev + 1 : Math.max(0, prev - 1));
     };
 
     useEffect(() => {
@@ -61,6 +57,8 @@ export default function ProductDetailPage() {
                     setVehicle(res.data);
                     // Init likes count
                     setLikesCount(res.data.favoritesCount || 0);
+                    // Đọc trạng thái yêu thích từ localStorage
+                    setIsLiked(isFavorite(id));
 
                     // Nạp danh sách xe cùng Category vào Redux Store để Selector xử lý
                     dispatch(fetchVehicles({ category: res.data.category, limit: 50 }));
