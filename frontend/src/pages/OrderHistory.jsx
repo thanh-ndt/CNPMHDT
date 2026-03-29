@@ -11,6 +11,7 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     if (!user?.email) {
@@ -57,6 +58,33 @@ const OrderHistory = () => {
 
   const handleReturnToCheckout = () => navigate('/checkout');
 
+  const filteredOrders = orders.filter(order => {
+    switch (activeTab) {
+        case 'pending': return order.status === 'pending';
+        case 'confirmed': return order.status === 'confirmed';
+        case 'shipping': return order.status === 'shipping';
+        case 'delivered': return order.status === 'delivered';
+        case 'cancelled': return order.status === 'cancelled';
+        case 'returned': return order.status === 'returned'; // We might map 'returned' to existing returns logic
+        default: return true;
+    }
+  });
+
+  // Calculate counts for tabs
+  const getCount = (status) => {
+      if (status === 'all') return orders.length;
+      return orders.filter(o => o.status === status).length;
+  };
+
+  const tabs = [
+    { key: 'all', label: 'Tất cả' },
+    { key: 'pending', label: 'Chờ xác nhận' },
+    { key: 'confirmed', label: 'Đã xác nhận' },
+    { key: 'shipping', label: 'Đang giao' },
+    { key: 'delivered', label: 'Đã giao' },
+    { key: 'cancelled', label: 'Đã hủy' }
+  ];
+
   if (!user) {
     return (
       <Container className="my-5 text-center py-5">
@@ -83,6 +111,33 @@ const OrderHistory = () => {
         </Col>
       </Row>
 
+      {/* Tabs */}
+      <div className="d-flex overflow-auto border-bottom mb-4" style={{ gap: '2rem' }}>
+          {tabs.map(tab => (
+              <div 
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`pb-3 position-relative cursor-pointer fw-medium text-nowrap`}
+                  style={{ 
+                      cursor: 'pointer',
+                      color: activeTab === tab.key ? '#dc3545' : '#6c757d',
+                      transition: 'color 0.2s'
+                  }}
+              >
+                  {tab.label}
+                  <span className="ms-2 badge rounded-pill bg-light text-dark border">
+                      {getCount(tab.key)}
+                  </span>
+                  {activeTab === tab.key && (
+                      <div 
+                          className="position-absolute bottom-0 w-100 bg-danger" 
+                          style={{ height: '3px', borderRadius: '3px 3px 0 0', left: 0 }}
+                      />
+                  )}
+              </div>
+          ))}
+      </div>
+
       <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
         <Card.Body className="p-0">
           {loading ? (
@@ -95,7 +150,7 @@ const OrderHistory = () => {
                  <i className="bi bi-exclamation-triangle fs-1 mb-3"></i>
                  <h5>{error}</h5>
              </div>
-          ) : orders.length === 0 ? (
+          ) : filteredOrders.length === 0 ? (
              <div className="py-5 my-4 text-center text-muted">
                <div className="display-1 mb-3 text-secondary opacity-50">📦</div>
                <h4 className="fw-bold text-dark">Bạn chưa có đơn hàng nào</h4>
@@ -115,7 +170,7 @@ const OrderHistory = () => {
                  </tr>
                </thead>
                <tbody>
-                 {orders.map((order) => (
+                 {filteredOrders.map((order) => (
                    <tr key={order.id} className="transition-all" style={{ transition: 'background-color 0.2s' }} onMouseOver={e=>e.currentTarget.style.backgroundColor='#fdfdfd'} onMouseOut={e=>e.currentTarget.style.backgroundColor='transparent'}>
                      <td className="px-4 py-4 fw-bold text-primary">{order.id}</td>
                      <td className="px-4 py-4 text-muted">{new Date(order.date).toLocaleString('vi-VN')}</td>
@@ -128,10 +183,15 @@ const OrderHistory = () => {
                      <td className="px-4 py-4 text-center">
                        {getStatusBadge(order.status)}
                      </td>
-                     <td className="px-4 py-4 text-center">
+                     <td className="px-4 py-4 text-center d-flex justify-content-center gap-2">
                        <Button variant="outline-danger" className="rounded-pill px-3 py-1 fw-semibold" size="sm" onClick={() => navigate(`/order/${order.id}`)}>
                          <i className="bi bi-eye me-1"></i> Chi tiết
                        </Button>
+                       {order.status === 'delivered' && (
+                           <Button variant="warning" className="rounded-pill px-3 py-1 fw-semibold text-dark" size="sm" onClick={() => navigate(`/order/${order.id}`)}>
+                               Đánh giá <i className="bi bi-star-fill text-dark ms-1" style={{fontSize: '12px'}}></i>
+                           </Button>
+                       )}
                      </td>
                    </tr>
                  ))}

@@ -18,6 +18,7 @@ const ChatWidget = () => {
     // States for owner
     const [rooms, setRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
     
     useEffect(() => {
         if (!user) return;
@@ -70,6 +71,10 @@ const ChatWidget = () => {
             
             const handleReceiveMessage = (message) => {
                 setMessages(prev => [...prev, message]);
+                // Nếu đang đóng widget thì tăng unread count (chỉ khi tin nhắn từ người khác)
+                if (!isOpen && user && message.senderId !== user._id) {
+                    setUnreadCount(prev => prev + 1);
+                }
             };
 
             socket.on('receive_message', handleReceiveMessage);
@@ -78,7 +83,14 @@ const ChatWidget = () => {
                 socket.off('receive_message', handleReceiveMessage);
             };
         }
-    }, [socket, roomId]);
+    }, [socket, roomId, isOpen, user?._id]);
+
+    // Reset unread khi mở chat
+    useEffect(() => {
+        if (isOpen) {
+            setUnreadCount(0);
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,7 +102,7 @@ const ChatWidget = () => {
 
         socket.emit('send_message', {
             roomId: roomId,
-            senderId: user._id,
+            senderId: user?._id,
             content: input.trim()
         });
 
@@ -130,7 +142,30 @@ const ChatWidget = () => {
                 {isOpen ? (
                     <span className="fs-4">✖</span>
                 ) : (
-                    <span className="fs-3">💬</span>
+                    <>
+                        <span className="fs-3">💬</span>
+                        {unreadCount > 0 && (
+                            <span style={{
+                                position: 'absolute',
+                                top: '-5px',
+                                right: '-5px',
+                                background: '#fff',
+                                color: '#cc0000',
+                                border: '2px solid #cc0000',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                            }}>
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
+                    </>
                 )}
             </Button>
 

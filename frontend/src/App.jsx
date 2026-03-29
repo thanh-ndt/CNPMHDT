@@ -25,6 +25,7 @@ import OrderDetail from './pages/OrderDetail';
 import ScheduleViewing from './pages/ScheduleViewing';
 import ProfilePage from './pages/ProfilePage';
 import FavoritesPage from './pages/FavoritesPage';
+import PromotionsPage from './pages/PromotionsPage';
 
 const App = () => {
     const { token } = useSelector((state) => state.auth);
@@ -54,6 +55,7 @@ const App = () => {
                     <Route path="/schedule-viewing" element={<ScheduleViewing />} />
                     <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
                     <Route path="/favorites" element={<FavoritesPage />} />
+                    <Route path="/promotions" element={<PromotionsPage />} />
                 </Route>
 
                 {/* Default route */}
