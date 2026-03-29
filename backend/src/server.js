@@ -34,9 +34,14 @@ app.use('/api/addresses', require('./routes/addressRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/returns', require('./routes/returnRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/promotions', require('./routes/promotionRoutes'));
+app.use('/api/vehicle-models', require('./routes/vehicleModelRoutes'));
 
 // Setup Socket.IO Server
-setupSocket(server);
+const io = setupSocket(server);
+app.set('io', io);
 
 const PORT = process.env.PORT || 5000;
 

@@ -11,6 +11,7 @@ const getVehicles = async (req, res) => {
       minPrice,
       maxPrice,
       engine,
+      brand,
       page = 1,
       limit = 8,
     } = req.query;
@@ -19,7 +20,7 @@ const getVehicles = async (req, res) => {
     const limitNumber = parseInt(limit, 10);
 
     // ── Build Match Stage ──────────────────────────────────────
-    const matchStage = {};
+    const matchStage = { isPublished: true };
 
     // 0. Lọc trực tiếp theo danh sách IDs (Cho tính năng Compare)
     if (req.query.ids) {
@@ -30,6 +31,11 @@ const getVehicles = async (req, res) => {
     // 1. Tìm kiếm theo tên xe (case-insensitive)
     if (search) {
       matchStage.name = { $regex: search, $options: 'i' };
+    }
+    
+    // 1.5 Lọc theo Hãng xe (Brand Object ID)
+    if (brand && mongoose.Types.ObjectId.isValid(brand)) {
+      matchStage.brand = new mongoose.Types.ObjectId(brand);
     }
 
     // 2. Lọc theo loại xe — dùng trường category, hỗ trợ nhiều loại (comma-separated)
@@ -109,19 +115,37 @@ const getSuggestions = async (req, res) => {
       return res.status(200).json({ success: true, data: [] });
     }
 
-    // Tìm kiếm max 5 xe khớp tên, không phân biệt hoa thường
-    const suggestions = await Vehicle.find(
+    // 1. Tìm kiếm tối đa 3 hãng xe khớp tên
+    const brandMatches = await Brand.find(
       { name: { $regex: keyword.trim(), $options: 'i' } }
+    ).limit(3);
+
+    // 2. Tìm kiếm tối đa 5 xe khớp tên, không phân biệt hoa thường
+    const vehicleMatches = await Vehicle.find(
+      { 
+        name: { $regex: keyword.trim(), $options: 'i' },
+        isPublished: true 
+      }
     )
     .select('name images formattedPrice price')
     .limit(5);
 
-    // Chuyển đổi để có chứa virtual formattedPrice
-    const formattedSuggestions = suggestions.map(doc => doc.toJSON());
+    // Chuyển đổi để có chứa virtual formattedPrice + gắn type
+    const brandSuggestions = brandMatches.map(b => ({
+      _id: b._id,
+      name: b.name,
+      images: b.logo ? [b.logo] : [],
+      type: 'brand'
+    }));
+
+    const vehicleSuggestions = vehicleMatches.map(v => ({
+      ...v.toJSON(),
+      type: 'vehicle'
+    }));
 
     res.status(200).json({
       success: true,
-      data: formattedSuggestions
+      data: [...brandSuggestions, ...vehicleSuggestions]
     });
   } catch (error) {
     console.error('Lỗi khi lấy gợi ý tìm kiếm:', error);
@@ -163,12 +187,12 @@ const getVehicleById = async (req, res) => {
       return res.status(400).json({ success: false, message: 'ID sản phẩm không hợp lệ' });
     }
 
-    const vehicle = await Vehicle.findById(id)
+    const vehicle = await Vehicle.findOne({ _id: id, isPublished: true })
       .populate('brand', 'name')
       .populate('vehicleModel', 'name');
 
     if (!vehicle) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy xe' });
+      return res.status(404).json({ success: false, message: 'Không tìm thấy xe hoặc xe đã bị ẩn' });
     }
 
     res.status(200).json({
@@ -181,9 +205,28 @@ const getVehicleById = async (req, res) => {
   }
 };
 
+// Lấy danh sách tất cả xe (dạng rút gọn ID + Name) để dùng cho dropdown/select
+const getAllVehicleList = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find({ isPublished: true })
+      .select('name brand')
+      .populate('brand', 'name')
+      .sort({ name: 1 });
+
+    res.status(200).json({
+      success: true,
+      data: vehicles
+    });
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách xe rút gọn:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
 module.exports = {
   getVehicles,
   getVehicleById,
   getSuggestions,
   toggleFavorite,
+  getAllVehicleList,
 };

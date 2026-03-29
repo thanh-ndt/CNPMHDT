@@ -28,6 +28,7 @@ export const vehicleService = {
             if (params.page) query.page = params.page;
             if (params.limit) query.limit = params.limit;
             if (params.ids) query.ids = params.ids;
+            if (params.brand) query.brand = params.brand;
 
             const response = await api.get('/vehicles', { params: query });
             return response.data; // { success, data, pagination }
