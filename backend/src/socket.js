@@ -5,7 +5,7 @@ const ChatRoom = require('./models/ChatRoom');
 const setupSocket = (server) => {
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ["http://localhost:5173", "http://localhost:5175"],
             methods: ["GET", "POST"],
             credentials: true
         }
@@ -33,11 +33,27 @@ const setupSocket = (server) => {
                 });
                 await newMessage.save();
 
-                // Lưu thay đổi update thời gian cho phòng chat để biết phòng nào mới có tin nhắn (tùy chọn)
-                await ChatRoom.findByIdAndUpdate(roomId, { updatedAt: new Date() });
+                // Lưu thay đổi update thời gian cho phòng chat để biết phòng nào mới có tin nhắn
+                const room = await ChatRoom.findByIdAndUpdate(roomId, { updatedAt: new Date() }).populate('customer', 'fullName');
+                
+                // Cập nhật thông báo cho Admin nếu người gửi là khách hàng
+                if (room && room.customer && room.customer._id.toString() === senderId.toString()) {
+                    const AdminNotification = require('./models/AdminNotification');
+                    const notification = new AdminNotification({
+                        title: 'Tin nhắn mới',
+                        message: `Có tin nhắn mới từ khách hàng ${room.customer.fullName || 'ẩn danh'}`,
+                        type: 'USER',
+                        link: '/admin/messages'
+                    });
+                    await notification.save();
+                    io.emit('new_admin_notification', notification);
+                }
 
                 // Phát tin nhắn lại cho tất cả user đang trong room (bao gồm cả người gửi để xác nhận)
                 io.to(roomId).emit('receive_message', newMessage);
+                
+                // Cập nhật giao diện quản lý chat toàn cục cho admin
+                io.emit('admin_receive_message', newMessage);
 
             } catch (error) {
                 console.error('Lỗi khi lưu tin nhắn socket:', error);

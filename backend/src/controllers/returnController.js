@@ -1,6 +1,7 @@
 const ReturnRequest = require('../models/ReturnRequest');
 const Order = require('../models/Order');
 const mongoose = require('mongoose');
+const AdminNotification = require('../models/AdminNotification');
 
 // POST /api/returns — Gửi yêu cầu trả hàng
 const createReturnRequest = async (req, res) => {
@@ -39,6 +40,20 @@ const createReturnRequest = async (req, res) => {
         });
 
         await returnRequest.save();
+
+        // Tạo thông báo cho Admin
+        const notification = new AdminNotification({
+            title: 'Yêu cầu trả hàng',
+            message: `Có yêu cầu trả hàng cho đơn ${orderId.toString().slice(-6)}. Lý do: ${reason}`,
+            type: 'RETURN',
+            link: '/admin/orders'
+        });
+        await notification.save();
+
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('new_admin_notification', notification);
+        }
 
         res.status(201).json({
             success: true,
