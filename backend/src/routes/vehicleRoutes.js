@@ -5,6 +5,9 @@ const vehicleController = require('../controllers/vehicleController');
 // GET /api/vehicles/suggestions
 router.get('/suggestions', vehicleController.getSuggestions);
 
+// GET /api/vehicles/all-list (rút gọn ID+Name cho dropdown)
+router.get('/all-list', vehicleController.getAllVehicleList);
+
 // GET /api/vehicles
 router.get('/', vehicleController.getVehicles);
 

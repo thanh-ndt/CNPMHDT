@@ -35,6 +35,7 @@ function normalizeItemsFromBackend(items) {
                 brandName: v.brand?.name || 'Honda',
                 manufacture: v.manufacture,
                 vehicleModelName: v.vehicleModel?.name,
+                vehicleModelId: v.vehicleModel?._id?.toString?.() || v.vehicleModel?._id,
                 quantity: it.quantity,
                 images: v.images || [],
             }

@@ -6,9 +6,10 @@ import { priceFormatter } from '../utils/priceFormatter';
 import { addToCartAsync } from '../redux/cartSlice';
 import { fetchVehicles, selectRelatedVehicles } from '../redux/vehicleSlice';
 import { specsLabelMap } from '../utils/constants';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { AiOutlineHeart, AiFillHeart, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import VehicleCard from '../components/VehicleCard';
 import { isFavorite, toggleFavorite } from './FavoritesPage';
+import { reviewService } from '../services/reviewService';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -20,6 +21,8 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeImage, setActiveImage] = useState('');
+    const [reviews, setReviews] = useState([]);
+    const [avgRating, setAvgRating] = useState(0);
     
     // State cho tính năng yêu thích - đồng bộ với localStorage
     const [isLiked, setIsLiked] = useState(false);
@@ -76,8 +79,24 @@ export default function ProductDetailPage() {
             }
         };
 
+        const fetchReviewData = async () => {
+            try {
+                const res = await reviewService.getVehicleReviews(id);
+                if (res.success) {
+                    setReviews(res.data);
+                    if (res.data.length > 0) {
+                        const sum = res.data.reduce((acc, curr) => acc + curr.rating, 0);
+                        setAvgRating((sum / res.data.length).toFixed(1));
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching reviews:', err);
+            }
+        };
+
         if (id) {
             fetchVehicle();
+            fetchReviewData();
         }
     }, [id, dispatch]);
 
@@ -237,6 +256,58 @@ export default function ProductDetailPage() {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* Section Đánh giá sản phẩm */}
+            <div className="mt-5 pt-5 border-top">
+                <div className="d-flex align-items-center justify-content-between mb-4">
+                    <h3 className="fw-bold mb-0">Đánh giá sản phẩm</h3>
+                    {reviews.length > 0 && (
+                        <div className="d-flex align-items-center gap-2">
+                            <span className="fs-4 fw-bold text-dark">{avgRating}</span>
+                            <div className="text-warning fs-5">
+                                {[...Array(5)].map((_, i) => (
+                                    i < Math.round(avgRating) ? <AiFillStar key={i} /> : <AiOutlineStar key={i} />
+                                ))}
+                            </div>
+                            <span className="text-muted">({reviews.length} đánh giá)</span>
+                        </div>
+                    )}
+                </div>
+
+                {reviews.length > 0 ? (
+                    <div className="row g-4">
+                        {reviews.map((rev) => (
+                            <div key={rev._id} className="col-12">
+                                <div className="card border-0 shadow-sm p-4 rounded-4 bg-white">
+                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div className="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style={{ width: '45px', height: '45px', fontSize: '1.1rem' }}>
+                                                {rev.customer?.fullName?.charAt(0).toUpperCase() || 'U'}
+                                            </div>
+                                            <div>
+                                                <h6 className="fw-bold mb-0">{rev.customer?.fullName || 'Người dùng ẩn danh'}</h6>
+                                                <div className="text-warning small">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        i < rev.rating ? <AiFillStar key={i} /> : <AiOutlineStar key={i} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small className="text-muted">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</small>
+                                    </div>
+                                    <p className="mb-0 text-dark-50" style={{ lineHeight: '1.6' }}>{rev.comment || 'Không có nhận xét.'}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-5 bg-light rounded-4 border border-dashed">
+                        <div className="fs-1 text-muted mb-3 opacity-50">⭐</div>
+                        <h5 className="text-muted">Chưa có đánh giá nào cho sản phẩm này</h5>
+                        <p className="text-muted small">Hãy là người đầu tiên sở hữu và đánh giá sản phẩm!</p>
+                    </div>
+                )}
             </div>
 
             {/* Section Có thể bạn sẽ thích */}

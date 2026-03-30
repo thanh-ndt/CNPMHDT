@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addAddress, fetchAddresses, resetAddressState } from '../redux/addressSlice';
 import { orderApi } from '../api/orderApi';
+import { validatePromotionApi } from '../api/promotionApi';
 import NotificationModal from '../components/NotificationModal';
 
 const Checkout = () => {
@@ -26,6 +27,12 @@ const Checkout = () => {
 
     const [paymentMethod, setPaymentMethod] = useState('payment-cod');
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+    // Promotion state
+    const [promoCode, setPromoCode] = useState('');
+    const [appliedPromo, setAppliedPromo] = useState(null);
+    const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+    const [promoMessage, setPromoMessage] = useState({ text: '', type: '' });
 
     // Notification modal state
     const [notification, setNotification] = useState({ show: false, title: '', message: '', type: 'info' });
@@ -59,8 +66,26 @@ const Checkout = () => {
             maximumFractionDigits: 0,
         }).format(price);
 
-    const calculateTotal = () => {
+    const calculateSubtotal = () => {
         return orderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    const shippingFee = 500000;
+
+    const calculateDiscount = () => {
+        if (!appliedPromo) return 0;
+        const subtotal = calculateSubtotal();
+        if (appliedPromo.type === 'fixed') {
+            return appliedPromo.discountValue;
+        } else {
+            return Math.round((subtotal * appliedPromo.discountValue) / 100);
+        }
+    };
+
+    const calculateTotal = () => {
+        const subtotal = calculateSubtotal();
+        const discount = calculateDiscount();
+        return Math.max(0, (subtotal + shippingFee) - discount);
     };
 
     // Address modal handlers
@@ -100,6 +125,46 @@ const Checkout = () => {
         }
     };
 
+    const handleApplyPromo = async () => {
+        if (!promoCode.trim()) {
+            setPromoMessage({ text: 'Vui lòng nhập mã giảm giá', type: 'error' });
+            return;
+        }
+
+        setIsApplyingPromo(true);
+        setPromoMessage({ text: '', type: '' });
+
+        try {
+            // Get unique vehicle model IDs from order items for validation
+            const vehicleModelIds = [...new Set(orderItems.map(item => item.vehicleModelId).filter(Boolean))];
+            
+            const res = await validatePromotionApi({ 
+                code: promoCode,
+                vehicleModelIds: vehicleModelIds
+            });
+
+            if (res.success) {
+                setAppliedPromo(res.data);
+                setPromoMessage({ text: 'Áp dụng mã thành công!', type: 'success' });
+            } else {
+                setPromoMessage({ text: res.message || 'Mã không hợp lệ', type: 'error' });
+            }
+        } catch (error) {
+            setPromoMessage({ 
+                text: error.response?.data?.message || 'Lỗi khi kiểm tra mã', 
+                type: 'error' 
+            });
+        } finally {
+            setIsApplyingPromo(false);
+        }
+    };
+
+    const handleRemovePromo = () => {
+        setAppliedPromo(null);
+        setPromoCode('');
+        setPromoMessage({ text: '', type: '' });
+    };
+
     const handlePlaceOrder = async () => {
         if (!selectedAddress) {
             showNotification('Thiếu địa chỉ', 'Vui lòng chọn hoặc thêm địa chỉ giao hàng.', 'warning');
@@ -114,6 +179,7 @@ const Checkout = () => {
                 customerEmail: user?.email,
                 shippingAddress: addressString,
                 paymentMethod: paymentMethod,
+                promotionId: appliedPromo?.id,
                 orderItems: orderItems.map(item => ({
                     vehicleId: item.vehicleId,
                     quantity: item.quantity
@@ -294,13 +360,52 @@ const Checkout = () => {
                             ))}
                             <ListGroup.Item className="d-flex justify-content-between py-3">
                                 <span>Phí vận chuyển</span>
-                                <strong>Miễn phí</strong>
+                                <strong>{formatPrice(shippingFee)}</strong>
                             </ListGroup.Item>
+                            
+                            {appliedPromo && (
+                                <ListGroup.Item className="d-flex justify-content-between py-3 text-success">
+                                    <span>Mã giảm giá : <strong>{appliedPromo.code || promoCode}</strong></span>
+                                    <strong>-{formatPrice(calculateDiscount())}</strong>
+                                </ListGroup.Item>
+                            )}
+
                             <ListGroup.Item className="d-flex justify-content-between py-3 bg-light">
                                 <span className="fw-bold">Tổng cộng</span>
                                 <strong className="text-danger fs-5">{formatPrice(calculateTotal())}</strong>
                             </ListGroup.Item>
                         </ListGroup>
+                        <Card.Body className="pt-0">
+                            <hr />
+                            <h6 className="mb-2">Mã Giảm Giá</h6>
+                            <Form.Group className="d-flex gap-2">
+                                <Form.Control 
+                                    type="text" 
+                                    placeholder="Nhập mã giảm giá..." 
+                                    value={promoCode}
+                                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                    disabled={appliedPromo || isApplyingPromo}
+                                />
+                                {appliedPromo ? (
+                                    <Button variant="outline-secondary" onClick={handleRemovePromo}>
+                                        Gỡ
+                                    </Button>
+                                ) : (
+                                    <Button 
+                                        variant="danger" 
+                                        onClick={handleApplyPromo}
+                                        disabled={isApplyingPromo}
+                                    >
+                                        {isApplyingPromo ? <Spinner size="sm" /> : 'Áp dụng'}
+                                    </Button>
+                                )}
+                            </Form.Group>
+                            {promoMessage.text && (
+                                <div className={`text-${promoMessage.type === 'success' ? 'success' : 'danger'} small mt-2`}>
+                                    {promoMessage.text}
+                                </div>
+                            )}
+                        </Card.Body>
                         <Card.Body>
                             <div className="d-grid">
                                 <Button

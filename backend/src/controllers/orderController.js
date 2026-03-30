@@ -5,10 +5,12 @@ const Payment = require('../models/Payment');
 const Vehicle = require('../models/Vehicle');
 const Cart = require('../models/Cart');
 const User = require('../models/User');
+const AdminNotification = require('../models/AdminNotification');
+const Promotion = require('../models/Promotion');
 
 const createOrder = async (req, res) => {
     try {
-        const { customerEmail, shippingAddress, paymentMethod, orderItems } = req.body;
+        const { customerEmail, shippingAddress, paymentMethod, orderItems, promotionId } = req.body;
 
         if (!customerEmail || !shippingAddress || !paymentMethod || !orderItems || orderItems.length === 0) {
             return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
@@ -50,12 +52,34 @@ const createOrder = async (req, res) => {
             });
         }
 
+        // 2.5. Xử lý Khuyến mãi và Phí vận chuyển
+        const shippingFee = 500000;
+        let discountAmount = 0;
+        let appliedPromotion = null;
+
+        if (promotionId) {
+            const promo = await Promotion.findById(promotionId);
+            if (promo && promo.isActive) {
+                appliedPromotion = promo._id;
+                if (promo.type === 'fixed') {
+                    discountAmount = promo.discountValue;
+                } else if (promo.type === 'percentage') {
+                    discountAmount = Math.round((totalAmount * promo.discountValue) / 100);
+                }
+            }
+        }
+
+        const finalAmount = Math.max(0, (totalAmount + shippingFee) - discountAmount);
+
         // 3. Tạo Order
         const newOrder = new Order({
             customer: user._id,
-            totalAmount,
+            totalAmount: finalAmount,
             shippingAddress,
-            status: 'pending' // Chờ xác nhận
+            status: 'pending',
+            promotion: appliedPromotion,
+            shippingFee,
+            discountAmount
         });
         await newOrder.save();
 
@@ -87,7 +111,7 @@ const createOrder = async (req, res) => {
 
         const payment = new Payment({
             order: newOrder._id,
-            amount: totalAmount,
+            amount: finalAmount,
             method: pMethodMapped,
             status: 'pending' // COD or wait for transaction
         });
@@ -102,12 +126,26 @@ const createOrder = async (req, res) => {
             await cart.save();
         }
 
+        // Tạo thông báo cho Admin
+        const notification = new AdminNotification({
+            title: 'Đơn hàng mới',
+            message: `Khách hàng ${customerEmail} vừa đặt cấu hình mới với tổng ${totalAmount}đ`,
+            type: 'ORDER',
+            link: '/admin/orders'
+        });
+        await notification.save();
+
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('new_admin_notification', notification);
+        }
+
         return res.status(201).json({
             success: true,
             message: 'Đặt hàng thành công!',
             data: {
                 orderId: newOrder._id,
-                totalAmount
+                totalAmount: finalAmount
             }
         });
 
