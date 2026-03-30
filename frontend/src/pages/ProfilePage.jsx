@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getProfileApi, updateProfileApi, changePasswordApi } from '../api/userApi';
 import { updateUser, logout } from '../redux/authSlice';
 import { logoutApi } from '../api/authApi';
-import '../styles/Profile.css';
+import '../components/css/Profile.css';
 
 const ProfilePage = () => {
     const dispatch = useDispatch();

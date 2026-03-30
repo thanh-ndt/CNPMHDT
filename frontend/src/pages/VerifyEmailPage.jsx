@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { verifyEmailApi } from '../api/authApi';
-import '../styles/Auth.css';
+import '../components/css/Auth.css';
 
 const VerifyEmailPage = () => {
     const location = useLocation();
