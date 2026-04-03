@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginApi } from '../api/authApi';
 import { loginSuccess } from '../redux/authSlice';
-import '../styles/Auth.css';
+import '../components/css/Auth.css';
 
 const LoginPage = () => {
     const dispatch = useDispatch();

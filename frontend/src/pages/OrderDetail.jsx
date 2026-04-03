@@ -5,6 +5,10 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { orderApi } from '../api/orderApi';
 import { returnApi } from '../api/returnApi';
+<<<<<<< HEAD
+=======
+import { reviewApi } from '../api/reviewApi';
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -22,6 +26,15 @@ const OrderDetail = () => {
     const [submittingReturn, setSubmittingReturn] = useState(false);
     const [existingReturn, setExistingReturn] = useState(null);
 
+<<<<<<< HEAD
+=======
+    // States cho đánh giá
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '', vehicleId: null, vehicleName: '' });
+    const [submittingReview, setSubmittingReview] = useState(false);
+    const [reviewedItems, setReviewedItems] = useState({});
+
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
     useEffect(() => {
         const fetchOrderDetail = async () => {
             try {
@@ -42,6 +55,28 @@ const OrderDetail = () => {
         if (id) fetchOrderDetail();
     }, [id]);
 
+<<<<<<< HEAD
+=======
+    useEffect(() => {
+        const checkReviews = async () => {
+            if (!orderData || !user?.email || orderData.order.status !== 'delivered') return;
+            const checks = {};
+            for (const item of orderData.items) {
+                if (item.vehicle) {
+                    try {
+                        const res = await reviewApi.checkReviewed(user.email, item.vehicle._id);
+                        if (res.success && res.reviewed) {
+                            checks[item.vehicle._id] = true;
+                        }
+                    } catch (e) {}
+                }
+            }
+            setReviewedItems(checks);
+        };
+        checkReviews();
+    }, [orderData, user]);
+
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
     // Kiểm tra yêu cầu trả hàng hiện có
     useEffect(() => {
         const checkExistingReturn = async () => {
@@ -80,6 +115,37 @@ const OrderDetail = () => {
         }
     };
 
+<<<<<<< HEAD
+=======
+    const handleOpenReview = (vehicle) => {
+        setReviewForm({ rating: 5, comment: '', vehicleId: vehicle._id, vehicleName: vehicle.name });
+        setShowReviewModal(true);
+    };
+
+    const handleSubmitReview = async (e) => {
+        e.preventDefault();
+        setSubmittingReview(true);
+        try {
+            const res = await reviewApi.createReview({
+                email: user.email,
+                orderId: id,
+                vehicleId: reviewForm.vehicleId,
+                rating: reviewForm.rating,
+                comment: reviewForm.comment
+            });
+            if (res.success) {
+                alert(res.message);
+                setShowReviewModal(false);
+                setReviewedItems(prev => ({ ...prev, [reviewForm.vehicleId]: true }));
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Lỗi khi gửi đánh giá.');
+        } finally {
+            setSubmittingReview(false);
+        }
+    };
+
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
     const handleCancelOrder = async () => {
         if (!window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')) return;
         setCancelling(true);
@@ -273,6 +339,10 @@ const OrderDetail = () => {
                                 <th className="px-4 py-3 border-0 text-center">Đơn giá</th>
                                 <th className="px-4 py-3 border-0 text-center">Số lượng</th>
                                 <th className="px-4 py-3 border-0 text-end">Thành tiền</th>
+<<<<<<< HEAD
+=======
+                                {order.status === 'delivered' && <th className="px-4 py-3 border-0 text-center">Đánh giá</th>}
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
                             </tr>
                         </thead>
                         <tbody>
@@ -294,6 +364,20 @@ const OrderDetail = () => {
                                     <td className="px-4 py-3 text-center fw-medium">{item.unitPrice.toLocaleString('vi-VN')} đ</td>
                                     <td className="px-4 py-3 text-center fw-bold text-dark">{item.quantity}</td>
                                     <td className="px-4 py-3 text-end text-danger fw-bold">{(item.unitPrice * item.quantity).toLocaleString('vi-VN')} đ</td>
+<<<<<<< HEAD
+=======
+                                    {order.status === 'delivered' && (
+                                        <td className="px-4 py-3 text-center">
+                                            {reviewedItems[item.vehicle?._id] ? (
+                                                <Badge bg="success" className="p-2"><i className="bi bi-check-circle me-1"></i>Đã đánh giá</Badge>
+                                            ) : (
+                                                <Button variant="warning" size="sm" className="rounded-pill px-3 fw-bold shadow-sm" onClick={() => handleOpenReview(item.vehicle)}>
+                                                    Đánh giá <i className="bi bi-star-fill text-dark ms-1" style={{fontSize: '12px'}}></i>
+                                                </Button>
+                                            )}
+                                        </td>
+                                    )}
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
                                 </tr>
                             ))}
                         </tbody>
@@ -356,6 +440,54 @@ const OrderDetail = () => {
                 </Modal.Footer>
             </Form>
         </Modal>
+<<<<<<< HEAD
+=======
+
+        {/* Modal đánh giá */}
+        <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered>
+            <Modal.Header closeButton className="border-0 pb-0">
+                <Modal.Title className="fw-bold fs-5">
+                    Đánh giá {reviewForm.vehicleName}
+                </Modal.Title>
+            </Modal.Header>
+            <Form onSubmit={handleSubmitReview}>
+                <Modal.Body>
+                    <div className="text-center mb-4">
+                        <div className="d-flex justify-content-center gap-2 fs-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <i 
+                                    key={star} 
+                                    className={`bi bi-star-fill cursor-pointer ${star <= reviewForm.rating ? 'text-warning' : 'text-secondary opacity-25'}`}
+                                    onClick={() => setReviewForm(prev => ({...prev, rating: star}))}
+                                    style={{ cursor: 'pointer', transition: 'color 0.2s' }}
+                                ></i>
+                            ))}
+                        </div>
+                        <div className="text-muted mt-2 small fw-medium">
+                            {reviewForm.rating === 5 ? 'Tuyệt vời' : reviewForm.rating === 4 ? 'Rất tốt' : reviewForm.rating === 3 ? 'Bình thường' : reviewForm.rating === 2 ? 'Tệ' : 'Rất tệ'}
+                        </div>
+                    </div>
+                    <Form.Group className="mb-3">
+                        <Form.Label className="fw-semibold">Nhận xét của bạn</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={4}
+                            placeholder="Hãy chia sẻ trải nghiệm của bạn về sản phẩm này..."
+                            value={reviewForm.comment}
+                            onChange={e => setReviewForm(prev => ({...prev, comment: e.target.value}))}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer className="border-0 pt-0">
+                    <Button variant="light" className="px-4" onClick={() => setShowReviewModal(false)}>Hủy</Button>
+                    <Button type="submit" variant="danger" className="px-4" disabled={submittingReview}>
+                        {submittingReview ? <Spinner animation="border" size="sm" className="me-1" /> : <i className="bi bi-send-check me-2"></i>}
+                        Gửi đánh giá
+                    </Button>
+                </Modal.Footer>
+            </Form>
+        </Modal>
+>>>>>>> 5e1bea02cda554f6c6f47b89853b3470a1106d4e
         </>
     );
 };

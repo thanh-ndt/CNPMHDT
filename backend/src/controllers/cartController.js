@@ -10,7 +10,7 @@ const formatCartResponse = async (cart) => {
         path: 'items.vehicle',
         populate: [
             { path: 'brand', select: 'name' },
-            { path: 'vehicleModel', select: 'name' }
+            { path: 'vehicleModel', select: '_id name' }
         ]
     });
 

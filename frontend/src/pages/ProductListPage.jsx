@@ -37,6 +37,7 @@ export default function ProductListPage() {
     const [showCompareModal, setShowCompareModal] = useState(false);
 
     const searchTerm = searchParams.get('search') || '';
+    const brandId = searchParams.get('brand') || '';
 
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
@@ -46,6 +47,7 @@ export default function ProductListPage() {
         if (appliedMin) params.minPrice = appliedMin;
         if (appliedMax) params.maxPrice = appliedMax;
         if (engineFilter) params.engine = engineFilter;
+        if (brandId) params.brand = brandId;
 
         const res = await vehicleService.fetchVehiclesData(params);
         if (res.success) {
@@ -53,7 +55,7 @@ export default function ProductListPage() {
             setPagination(res.pagination || { currentPage: page, totalPages: 1 });
         }
         setLoading(false);
-    }, [searchTerm, selectedCategories, appliedMin, appliedMax, engineFilter]);
+    }, [searchTerm, selectedCategories, appliedMin, appliedMax, engineFilter, brandId]);
 
     useEffect(() => {
         fetchData(1);
@@ -146,7 +148,7 @@ export default function ProductListPage() {
                     <Col lg={9} xl={10}>
                         <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                             <h2 className="fw-bold mb-0">
-                                {searchTerm ? `Kết quả cho "${searchTerm}"` : 'Tất cả sản phẩm'}
+                                {searchTerm ? `Kết quả cho "${searchTerm}"` : (brandId ? 'Sản phẩm theo hãng' : 'Tất cả sản phẩm')}
                             </h2>
                             <Button
                                 variant={isCompareMode ? 'danger' : 'outline-danger'}

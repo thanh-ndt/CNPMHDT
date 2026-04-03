@@ -29,6 +29,14 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Promotion',
     },
+    shippingFee: {
+      type: Number,
+      default: 500000,
+    },
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
