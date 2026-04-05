@@ -77,7 +77,7 @@ app.use(express.static(frontendPath));
 
 // 2. Catch-all: Trả về index.html cho tất cả các route không phải API
 // Điều này giúp React Router hoạt động chính xác khi refresh trang
-app.get('/*path', (req, res, next) => {
+app.get('*', (req, res, next) => {
   // Nếu request bắt đầu bằng /api, bỏ qua để đi tới error handler hoặc 404 API
   if (req.path.startsWith('/api')) {
     return next();
