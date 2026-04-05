@@ -38,8 +38,8 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 
 
-// Route kiểm tra server
-app.get('/', (req, res) => {
+// Route kiểm tra status API
+app.get('/api/status', (req, res) => {
   res.json({ message: 'API web bán xe máy đang hoạt động!' });
 });
 
@@ -76,23 +76,23 @@ app.use(express.static(frontendPath));
 // 2. Catch-all: Trả về index.html cho tất cả các route không phải API
 // Điều này giúp React Router hoạt động chính xác khi refresh trang
 app.get('/*catchAll', (req, res, next) => {
-  // Nếu request bắt đầu bằng /api, bỏ qua để đi tới error handler hoặc 404 API
+  // Bỏ qua nếu là request API
   if (req.path.startsWith('/api')) {
     return next();
   }
 
-  const indexPath = path.join(frontendPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    // Nếu trong môi trường phát triển (không có build), có thể báo lỗi hoặc bỏ qua
-    if (process.env.NODE_ENV === 'production') {
-      console.error('LỖI: Không tìm thấy tệp index.html tại:', indexPath);
-      res.status(404).send('Frontend build is missing. Hãy chạy "npm run build" ở thư mục frontend.');
-    } else {
-      next(); // Đi tiếp tới các route khác hoặc 404 mặc định
+  const indexPath = path.resolve(frontendPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error('LỖI phục vụ index.html:', err);
+      // Nếu không tìm thấy file build, trả về 404 thân thiện hơn
+      if (process.env.NODE_ENV !== 'production') {
+          res.status(404).send('Không tìm thấy frontend build. Hãy chạy "npm run build" ở thư mục frontend.');
+      } else {
+          res.status(404).end();
+      }
     }
-  }
+  });
 });
 
 // Setup Socket.IO Server
