@@ -8,7 +8,6 @@ const VehicleModel = require('../models/VehicleModel');
 // Path to .env file
 dotenv.config({ path: __dirname + '/../../.env' });
 
-// Kết nối đến MongoDB
 const connectDB = async () => {
   try {
     // Ưu tiên dùng MONGO_URI trong .env, nếu không có thì dùng honda_store
@@ -24,87 +23,144 @@ const connectDB = async () => {
 // Đọc dữ liệu từ file JSON mới
 const vehiclesData = require('../../data/vehicles_data.json');
 
-const seedData = async () => {
+const getBrandInfo = (brandName) => {
+  let country = 'Nhật Bản';
+  if (brandName === 'VinFast') country = 'Việt Nam';
+  if (brandName === 'Vespa' || brandName === 'Piaggio') country = 'Ý';
+  if (brandName === 'SYM') country = 'Đài Loan';
+
+  return {
+    country,
+    description: `Hãng xe ${brandName}`,
+  };
+};
+
+const seedData = async ({ resetExisting = false, onlyIfEmpty = false } = {}) => {
   try {
-    // 1. Kết nối DB
-    await connectDB();
+    // Auto-seed cho môi trường production thường nên chỉ chạy khi DB trống.
+    if (onlyIfEmpty) {
+      const existingVehicles = await Vehicle.countDocuments();
+      if (existingVehicles > 0) {
+        console.log(`Bỏ qua seed vì đã có ${existingVehicles} xe trong CSDL.`);
+        return { skipped: true, reason: 'DB is not empty', existingVehicles };
+      }
+    }
 
-    // 2. Xóa dữ liệu cũ để tránh trùng lặp
-    console.log('Đang xóa dữ liệu cũ...');
-    await Vehicle.deleteMany();
-    await Brand.deleteMany();
-    await VehicleModel.deleteMany();
+    if (resetExisting) {
+      console.log('Đang xóa dữ liệu cũ...');
+      await Vehicle.deleteMany();
+      await Brand.deleteMany();
+      await VehicleModel.deleteMany();
+    }
 
-    // 3. Tạo các Brand tự động từ tên xe
+    // 1. Tạo/upsert Brand từ tên xe
     const brandNames = [...new Set(vehiclesData.map(v => v.name.split(' ')[0]))];
     const brandMap = {};
     for (const bName of brandNames) {
-      let country = 'Nhật Bản';
-      if (bName === 'VinFast') country = 'Việt Nam';
-      if (bName === 'Vespa' || bName === 'Piaggio') country = 'Ý';
-      if (bName === 'SYM') country = 'Đài Loan';
-      
-      const brand = await Brand.create({
-        name: bName,
-        country: country,
-        description: `Hãng xe ${bName}`
-      });
+      const brandInfo = getBrandInfo(bName);
+      const brand = await Brand.findOneAndUpdate(
+        { name: bName },
+        {
+          $set: {
+            name: bName,
+            country: brandInfo.country,
+            description: brandInfo.description,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
       brandMap[bName] = brand._id;
     }
-    console.log(`Đã tạo ${brandNames.length} Brands.`);
+    console.log(`Đã upsert ${brandNames.length} Brands.`);
 
-    // 4. Tạo các VehicleModel (Danh mục / Loại xe)
-    const typesToCreate = [...new Set(vehiclesData.map(v => v.category))];
+    // 2. Tạo/upsert VehicleModel theo cặp brand + category
     const categoryMap = {};
-    
-    for (const type of typesToCreate) {
-      const model = await VehicleModel.create({
-        name: type,
-        engineType: type === 'Xe điện' ? 'Motor điện' : 'Động cơ đốt trong',
-        description: `Danh mục: ${type}`,
-      });
-      categoryMap[type] = model._id;
-    }
-    console.log(`Đã tạo ${typesToCreate.length} danh mục (Vehicle Models).`);
 
-    // 5. Chuẩn bị dữ liệu 32 xe
-    const finalVehicles = vehiclesData.map((bike) => {
+    for (const bike of vehiclesData) {
       const bName = bike.name.split(' ')[0];
+      const category = bike.category;
+      const brandId = brandMap[bName];
+      const categoryKey = `${bName}::${category}`;
+
+      if (categoryMap[categoryKey]) continue;
+
+      const model = await VehicleModel.findOneAndUpdate(
+        { name: category, brand: brandId },
+        {
+          $set: {
+            name: category,
+            brand: brandId,
+            description: `Danh mục: ${category}`,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      categoryMap[categoryKey] = model._id;
+    }
+    console.log(`Đã upsert ${Object.keys(categoryMap).length} Vehicle Models.`);
+
+    // 3. Upsert danh sách xe
+    let insertedOrUpdated = 0;
+    for (const bike of vehiclesData) {
+      const bName = bike.name.split(' ')[0];
+      const categoryKey = `${bName}::${bike.category}`;
       const imageUrl = bike.images && bike.images.length > 0 ? bike.images[0] : '';
 
-      const rating = Math.round((4.5 + Math.random() * 0.5) * 10) / 10;
-      const soldCount = Math.floor(Math.random() * 491) + 10;
+      await Vehicle.findOneAndUpdate(
+        { name: bike.name },
+        {
+          $set: {
+            name: bike.name,
+            price: bike.price,
+            category: bike.category,
+            engineCapacity: bike.engineCapacity,
+            description: bike.description,
+            specifications: bike.specifications || {},
+            stockQuantity: Math.floor(Math.random() * 50) + 5,
+            status: 'available',
+            brand: brandMap[bName],
+            vehicleModel: categoryMap[categoryKey],
+            images: [imageUrl],
+            rating: Math.round((4.5 + Math.random() * 0.5) * 10) / 10,
+            soldCount: Math.floor(Math.random() * 491) + 10,
+            favoritesCount: Math.floor(Math.random() * 151) + 50,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
 
-      return {
-        name: bike.name,
-        price: bike.price,
-        category: bike.category,
-        engineCapacity: bike.engineCapacity,
-        description: bike.description,
-        specifications: bike.specifications || {},
-        stockQuantity: Math.floor(Math.random() * 50) + 5,
-        status: 'available',
-        brand: brandMap[bName],
-        vehicleModel: categoryMap[bike.category],
-        images: [imageUrl],
-        rating,
-        soldCount,
-        favoritesCount: Math.floor(Math.random() * 151) + 50, // 50-200
-        numReviews: Math.floor(soldCount * 0.3), // ~30% người mua để lại đánh giá
-      };
-    });
+      insertedOrUpdated += 1;
+    }
 
-    // 6. Bulk Insert vào collection vehicles
-    await Vehicle.insertMany(finalVehicles);
-    console.log('✅ SEED THÀNH CÔNG: Đã chèn 32 loại xe máy Honda vào CSDL!');
-
-    // 7. Thoát an toàn
-    process.exit();
+    console.log(`✅ SEED THÀNH CÔNG: Đã upsert ${insertedOrUpdated} xe vào CSDL!`);
+    return { skipped: false, insertedOrUpdated };
   } catch (error) {
     console.error('❌ LỖI SEED:', error);
+    throw error;
+  }
+};
+
+const runCli = async () => {
+  try {
+    await connectDB();
+
+    const resetExisting = process.argv.includes('--reset');
+    const onlyIfEmpty = process.argv.includes('--if-empty');
+
+    await seedData({ resetExisting, onlyIfEmpty });
+    process.exit(0);
+  } catch (error) {
     process.exit(1);
   }
 };
 
-// Khởi chạy hàm
-seedData();
+if (require.main === module) {
+  runCli();
+}
+
+module.exports = {
+  seedData,
+  connectDB,
+};
