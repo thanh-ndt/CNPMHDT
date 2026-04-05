@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -67,6 +69,33 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/promotions', require('./routes/promotionRoutes'));
 app.use('/api/vehicle-models', require('./routes/vehicleModelRoutes'));
+
+// --- PHỤC VỤ FRONTEND ---
+// 1. Phục vụ các file tĩnh (js, css, images) từ frontend/dist
+const frontendPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendPath));
+
+// 2. Catch-all: Trả về index.html cho tất cả các route không phải API
+// Điều này giúp React Router hoạt động chính xác khi refresh trang
+app.get('/*path', (req, res, next) => {
+  // Nếu request bắt đầu bằng /api, bỏ qua để đi tới error handler hoặc 404 API
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    // Nếu trong môi trường phát triển (không có build), có thể báo lỗi hoặc bỏ qua
+    if (process.env.NODE_ENV === 'production') {
+      console.error('LỖI: Không tìm thấy tệp index.html tại:', indexPath);
+      res.status(404).send('Frontend build is missing. Hãy chạy "npm run build" ở thư mục frontend.');
+    } else {
+      next(); // Đi tiếp tới các route khác hoặc 404 mặc định
+    }
+  }
+});
 
 // Setup Socket.IO Server
 const io = setupSocket(server);
