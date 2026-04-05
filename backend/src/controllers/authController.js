@@ -75,7 +75,7 @@ const register = async (req, res) => {
           `,
             });
         } catch (emailError) {
-            console.log("ERROR:", err);
+            console.log("ERROR:", emailError);
             console.error('Lỗi gửi email:', emailError);
             // Vẫn trả về thành công nhưng thông báo lỗi email
             return res.status(201).json({
@@ -88,7 +88,7 @@ const register = async (req, res) => {
             message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
         });
     } catch (error) {
-        console.log("ERROR:", err);
+        console.log("ERROR:", error);
         console.error('Lỗi hệ thống đăng ký:', error);
         res.status(500).json({ message: 'Lỗi server khi đăng ký. Vui lòng thử lại sau.' });
     }
