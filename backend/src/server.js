@@ -6,7 +6,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
-const { seedData } = require('./utils/seed');
+
 
 const app = express();
 const http = require('http');
@@ -36,9 +36,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-const shouldAutoSeed = process.env.AUTO_SEED === 'true';
-const shouldSeedOnlyIfEmpty = process.env.AUTO_SEED_ONLY_IF_EMPTY !== 'false';
-const shouldSeedReset = process.env.AUTO_SEED_RESET === 'true';
+
 
 // Route kiểm tra server
 app.get('/', (req, res) => {
@@ -77,7 +75,7 @@ app.use(express.static(frontendPath));
 
 // 2. Catch-all: Trả về index.html cho tất cả các route không phải API
 // Điều này giúp React Router hoạt động chính xác khi refresh trang
-app.get('*', (req, res, next) => {
+app.get('/*catchAll', (req, res, next) => {
   // Nếu request bắt đầu bằng /api, bỏ qua để đi tới error handler hoặc 404 API
   if (req.path.startsWith('/api')) {
     return next();
@@ -116,13 +114,7 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    if (shouldAutoSeed) {
-      console.log('AUTO_SEED đang bật. Bắt đầu seed dữ liệu mẫu...');
-      await seedData({
-        resetExisting: shouldSeedReset,
-        onlyIfEmpty: shouldSeedOnlyIfEmpty,
-      });
-    }
+
 
     server.listen(PORT, () => {
       console.log(`Server đang chạy trên port ${PORT} (Có tích hợp Socket.io)`);
