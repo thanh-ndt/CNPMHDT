@@ -10,7 +10,7 @@ const http = require('http');
 const server = http.createServer(app);
 const setupSocket = require('./socket');
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://cnpmhdt.onrender.com',
+  origin: process.env.CLIENT_URL || 'https://sellmotorbikes.onrender.com',
   credentials: true
 }));
 app.use(bodyParser.json());
