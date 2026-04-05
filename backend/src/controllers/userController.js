@@ -23,9 +23,20 @@ const updateProfile = async (req, res) => {
     try {
         const { fullName, phoneNumber, dob, avatar } = req.body;
 
+        // Chuẩn bị dữ liệu cập nhật
+        const updateData = { fullName, phoneNumber, avatar };
+        
+        // Nếu dob là chuỗi rỗng thì không cập nhật (tránh lỗi Mongoose Date)
+        if (dob && dob.trim() !== '') {
+            updateData.dob = dob;
+        } else if (dob === '') {
+            // Hoặc có thể đặt về null nếu muốn xóa ngày sinh
+            updateData.dob = null;
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             req.user._id,
-            { fullName, phoneNumber, dob, avatar },
+            updateData,
             { new: true, runValidators: true }
         ).select('-password -emailVerifyToken -resetPasswordToken -resetPasswordExpires');
 
@@ -35,7 +46,7 @@ const updateProfile = async (req, res) => {
         });
     } catch (error) {
         console.error('Lỗi cập nhật profile:', error);
-        res.status(500).json({ message: 'Lỗi server.' });
+        res.status(500).json({ message: 'Lỗi server khi cập nhật hồ sơ.' });
     }
 };
 

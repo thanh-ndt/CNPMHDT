@@ -9,12 +9,29 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const setupSocket = require('./socket');
+// CORS setup for multiple origins
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://cnpmhdt.onrender.com',
+  'https://sellmotorbikes.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://sellmotorbikes.onrender.com',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS blocked for this origin'));
+    }
+  },
   credentials: true
 }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+// Tăng giới hạn dữ liệu để upload ảnh đại diện (avatar)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Kết nối MongoDB
 connectDB();
@@ -22,6 +39,16 @@ connectDB();
 // Route kiểm tra server
 app.get('/', (req, res) => {
   res.json({ message: 'API web bán xe máy đang hoạt động!' });
+});
+
+// Route Health Check để debug 404
+app.get('/api/check', (req, res) => {
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV,
+        message: 'Backend API is reachable at /api'
+    });
 });
 
 // Routes
@@ -42,6 +69,15 @@ app.use('/api/vehicle-models', require('./routes/vehicleModelRoutes'));
 // Setup Socket.IO Server
 const io = setupSocket(server);
 app.set('io', io);
+
+// Global Error Handler Middleware
+app.use((err, req, res, next) => {
+    console.error('Unhandled Error:', err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Lỗi hệ thống không xác định.',
+        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
 
 const PORT = process.env.PORT || 5000;
 

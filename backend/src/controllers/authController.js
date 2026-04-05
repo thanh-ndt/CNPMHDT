@@ -22,6 +22,7 @@ const register = async (req, res) => {
             return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc.' });
         }
 
+        // Kiểm tra email tồn tại
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Email này đã được sử dụng.' });
@@ -34,39 +35,60 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const emailVerifyToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 
-        const user = await User.create({
+        // Chuẩn bị dữ liệu user (Xử lý trường hợp dob là chuỗi rỗng)
+        const userData = {
             email,
             password: hashedPassword,
             fullName,
             phoneNumber,
-            dob,
             emailVerifyToken,
-        });
+        };
+
+        if (dob && dob.trim() !== '') {
+            userData.dob = dob;
+        }
+
+        let user;
+        try {
+            user = await User.create(userData);
+        } catch (dbError) {
+            console.error('Lỗi khi lưu User vào DB:', dbError);
+            return res.status(400).json({ message: 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.' });
+        }
 
         // Gửi email xác thực
-        await sendEmail({
-            to: email,
-            subject: 'Mã OTP xác thực tài khoản - Web Bán Xe Máy',
-            html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #e74c3c;">Chào mừng đến với Web Bán Xe Máy!</h2>
-          <p>Xin chào <strong>${fullName || email}</strong>,</p>
-          <p>Cảm ơn bạn đã đăng ký. Mã xác thực (OTP) của bạn là:</p>
-          <div style="font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 5px; margin: 24px 0; text-align: center; background: #feeff0; padding: 16px; border-radius: 8px;">
-            ${emailVerifyToken}
-          </div>
-          <p>Mã này có hiệu lực trong 24 giờ.</p>
-          <p>Nếu bạn không đăng ký tài khoản, hãy bỏ qua email này.</p>
-        </div>
-      `,
-        });
+        try {
+            await sendEmail({
+                to: email,
+                subject: 'Mã OTP xác thực tài khoản - Web Bán Xe Máy',
+                html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #e74c3c;">Chào mừng đến với Web Bán Xe Máy!</h2>
+              <p>Xin chào <strong>${fullName || email}</strong>,</p>
+              <p>Cảm ơn bạn đã đăng ký. Mã xác thực (OTP) của bạn là:</p>
+              <div style="font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 5px; margin: 24px 0; text-align: center; background: #feeff0; padding: 16px; border-radius: 8px;">
+                ${emailVerifyToken}
+              </div>
+              <p>Mã này có hiệu lực trong 24 giờ.</p>
+              <p>Nếu bạn không đăng ký tài khoản, hãy bỏ qua email này.</p>
+            </div>
+          `,
+            });
+        } catch (emailError) {
+            console.error('Lỗi gửi email:', emailError);
+            // Vẫn trả về thành công nhưng thông báo lỗi email
+            return res.status(201).json({
+                message: 'Đăng ký thành công, nhưng hệ thống gặp sự cố khi gửi email. Vui lòng liên hệ Admin hoặc thử lại sau.',
+                emailError: true
+            });
+        }
 
         res.status(201).json({
             message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
         });
     } catch (error) {
-        console.error('Lỗi đăng ký:', error);
-        res.status(500).json({ message: 'Lỗi server khi đăng ký.' });
+        console.error('Lỗi hệ thống đăng ký:', error);
+        res.status(500).json({ message: 'Lỗi server khi đăng ký. Vui lòng thử lại sau.' });
     }
 };
 
