@@ -30,7 +30,7 @@ const ScheduleViewing = () => {
     // Lấy danh sách xe thật từ DB
     const fetchVehicles = async () => {
         try {
-            const res = await axios.get('https://cnpmhdt-admin.onrender.com/api/vehicles/all-list');
+            const res = await axios.get('https://cnpmhdt.onrender.com/api/vehicles/all-list');
             if (res.data.success) {
                 setVehicles(res.data.data);
             }
@@ -42,7 +42,7 @@ const ScheduleViewing = () => {
         if (!user?._id) return;
         setFetchingHistory(true);
         try {
-            const res = await axios.get(`https://cnpmhdt-admin.onrender.com/api/appointments/customer/${user._id}`);
+            const res = await axios.get(`https://cnpmhdt.onrender.com/api/appointments/customer/${user._id}`);
             if (res.data.success) {
                 setAppointmentHistory(res.data.data);
             }
@@ -87,7 +87,7 @@ const ScheduleViewing = () => {
             payload.guestEmail = formData.guestEmail;
         }
 
-        const res = await axios.post('https://cnpmhdt-admin.onrender.com/api/appointments', payload);
+        const res = await axios.post('https://cnpmhdt.onrender.com/api/appointments', payload);
         if (res.data.success) {
             setSuccess(true);
             setFormData({
@@ -101,7 +101,7 @@ const ScheduleViewing = () => {
             });
             if (user) {
                 // Refresh history after new booking
-                const historyRes = await axios.get(`https://cnpmhdt-admin.onrender.com/api/appointments/customer/${user._id}`);
+                const historyRes = await axios.get(`https://cnpmhdt.onrender.com/api/appointments/customer/${user._id}`);
                 if (historyRes.data.success) setAppointmentHistory(historyRes.data.data);
             }
             setTimeout(() => setSuccess(false), 5000);

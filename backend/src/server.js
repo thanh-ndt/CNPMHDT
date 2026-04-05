@@ -16,6 +16,7 @@ const setupSocket = require('./socket');
 const allowedOrigins = [
   'https://cnpmhdt.onrender.com',
   'https://sell-motorbikes.onrender.com',
+  'http://localhost:5173'
 ].filter(Boolean);
 
 app.use(cors({
@@ -36,12 +37,12 @@ app.get('/api/status', (req, res) => {
 
 // Route Health Check để debug 404
 app.get('/api/check', (req, res) => {
-    res.json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        env: process.env.NODE_ENV,
-        message: 'Backend API is reachable at /api'
-    });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    message: 'Backend API is reachable at /api'
+  });
 });
 
 // Routes
@@ -78,9 +79,9 @@ app.get('/*catchAll', (req, res, next) => {
       console.error('LỖI phục vụ index.html:', err);
       // Nếu không tìm thấy file build, trả về 404 thân thiện hơn
       if (process.env.NODE_ENV !== 'production') {
-          res.status(404).send('Không tìm thấy frontend build. Hãy chạy "npm run build" ở thư mục frontend.');
+        res.status(404).send('Không tìm thấy frontend build. Hãy chạy "npm run build" ở thư mục frontend.');
       } else {
-          res.status(404).end();
+        res.status(404).end();
       }
     }
   });
@@ -92,11 +93,11 @@ app.set('io', io);
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err);
-    res.status(err.status || 500).json({
-        message: err.message || 'Lỗi hệ thống không xác định.',
-        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
+  console.error('Unhandled Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Lỗi hệ thống không xác định.',
+    error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
 
 const PORT = process.env.PORT || 5000;

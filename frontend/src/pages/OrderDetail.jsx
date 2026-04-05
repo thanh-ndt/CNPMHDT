@@ -32,7 +32,7 @@ const OrderDetail = () => {
     useEffect(() => {
         const fetchOrderDetail = async () => {
             try {
-                const res = await axios.get(`https://cnpmhdt-admin.onrender.com/api/orders/${id}`);
+                const res = await axios.get(`https://cnpmhdt.onrender.com/api/orders/${id}`);
                 if (res.data.success) {
                     setOrderData(res.data.data);
                 } else {
