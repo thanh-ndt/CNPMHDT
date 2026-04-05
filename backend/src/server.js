@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
+const { seedData } = require('./utils/seed');
 
 const app = express();
 const http = require('http');
@@ -33,8 +34,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Kết nối MongoDB
-connectDB();
+const shouldAutoSeed = process.env.AUTO_SEED === 'true';
+const shouldSeedOnlyIfEmpty = process.env.AUTO_SEED_ONLY_IF_EMPTY !== 'false';
+const shouldSeedReset = process.env.AUTO_SEED_RESET === 'true';
 
 // Route kiểm tra server
 app.get('/', (req, res) => {
@@ -81,8 +83,27 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`Server đang chạy trên port ${PORT} (Có tích hợp Socket.io)`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    if (shouldAutoSeed) {
+      console.log('AUTO_SEED đang bật. Bắt đầu seed dữ liệu mẫu...');
+      await seedData({
+        resetExisting: shouldSeedReset,
+        onlyIfEmpty: shouldSeedOnlyIfEmpty,
+      });
+    }
+
+    server.listen(PORT, () => {
+      console.log(`Server đang chạy trên port ${PORT} (Có tích hợp Socket.io)`);
+    });
+  } catch (error) {
+    console.error('Không thể khởi động server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 module.exports = app;
