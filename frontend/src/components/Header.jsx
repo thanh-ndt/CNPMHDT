@@ -45,7 +45,7 @@ const Header = () => {
         const delayDebounceTimeout = setTimeout(async () => {
             if (searchTerm.trim().length > 0) {
                 try {
-                    const res = await axios.get(`https://cnpmhdt.onrender.com/api/vehicles/suggestions?keyword=${encodeURIComponent(searchTerm)}`);
+                    const res = await axios.get(`https://cnpmhdt-admin.onrender.com/api/vehicles/suggestions?keyword=${encodeURIComponent(searchTerm)}`);
                     if (res.data.success) {
                         setSuggestions(res.data.data);
                         setShowDropdown(true);
