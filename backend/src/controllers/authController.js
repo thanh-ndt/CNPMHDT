@@ -33,15 +33,14 @@ const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const emailVerifyToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 
-        // Chuẩn bị dữ liệu user (Xử lý trường hợp dob là chuỗi rỗng)
+        // Chuẩn bị dữ liệu user (Mặc định xác thực email là true để bypass)
         const userData = {
             email,
             password: hashedPassword,
             fullName,
             phoneNumber,
-            emailVerifyToken,
+            isEmailVerified: true,
         };
 
         if (dob && dob.trim() !== '') {
@@ -49,8 +48,7 @@ const register = async (req, res) => {
         }
 
         console.log(`-------------------------------------------`);
-        console.log(`MÃ OTP ĐĂNG KÝ CHO EMAIL: ${email}`);
-        console.log(`LÀ: ${emailVerifyToken}`);
+        console.log(`ĐĂNG KÝ USER MỚI (Bypass OTP): ${email}`);
         console.log(`-------------------------------------------`);
 
         let user;
@@ -61,36 +59,8 @@ const register = async (req, res) => {
             return res.status(400).json({ message: 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.' });
         }
 
-        // Gửi email xác thực
-        try {
-            await sendEmail({
-                to: email,
-                subject: 'Mã OTP xác thực tài khoản - Web Bán Xe Máy',
-                html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #e74c3c;">Chào mừng đến với Web Bán Xe Máy!</h2>
-              <p>Xin chào <strong>${fullName || email}</strong>,</p>
-              <p>Cảm ơn bạn đã đăng ký. Mã xác thực (OTP) của bạn là:</p>
-              <div style="font-size: 32px; font-weight: bold; color: #e74c3c; letter-spacing: 5px; margin: 24px 0; text-align: center; background: #feeff0; padding: 16px; border-radius: 8px;">
-                ${emailVerifyToken}
-              </div>
-              <p>Mã này có hiệu lực trong 24 giờ.</p>
-              <p>Nếu bạn không đăng ký tài khoản, hãy bỏ qua email này.</p>
-            </div>
-          `,
-            });
-        } catch (emailError) {
-            console.log("ERROR:", emailError);
-            console.error('Lỗi gửi email:', emailError);
-            // Vẫn trả về thành công nhưng thông báo lỗi email
-            return res.status(201).json({
-                message: 'Đăng ký thành công, nhưng hệ thống gặp sự cố khi gửi email. Vui lòng liên hệ Admin hoặc thử lại sau.',
-                emailError: true
-            });
-        }
-
         res.status(201).json({
-            message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
+            message: 'Đăng ký thành công! Tài khoản của bạn đã được tự động kích hoạt.',
         });
     } catch (error) {
         console.log("ERROR:", error);

@@ -33,9 +33,9 @@ const RegisterPage = () => {
                 password: form.password
             });
             setSuccess(res.data.message);
-            // Navigate to verify-email with email included in the navigation state or URL
+            // Navigate directly to login since email verification is bypassed
             setTimeout(() => {
-                navigate(`/verify-email?email=${encodeURIComponent(form.email)}`);
+                navigate('/login');
             }, 1500);
         } catch (err) {
             setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
