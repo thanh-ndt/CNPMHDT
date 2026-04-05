@@ -48,6 +48,11 @@ const register = async (req, res) => {
             userData.dob = dob;
         }
 
+        console.log(`-------------------------------------------`);
+        console.log(`MÃ OTP ĐĂNG KÝ CHO EMAIL: ${email}`);
+        console.log(`LÀ: ${emailVerifyToken}`);
+        console.log(`-------------------------------------------`);
+
         let user;
         try {
             user = await User.create(userData);

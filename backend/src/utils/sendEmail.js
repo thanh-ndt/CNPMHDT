@@ -11,11 +11,14 @@ const sendEmail = async ({ to, subject, html }) => {
         return;
     }
 
+    console.log(`Đang khởi tạo gửi email qua Brevo tới: ${to}...`);
+
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp-relay.brevo.com',
+        port: 587,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            user: process.env.EMAIL_USER, // Brevo Login Email
+            pass: process.env.BREVO_API_KEY, // Brevo SMTP Key
         },
     });
 
@@ -26,7 +29,14 @@ const sendEmail = async ({ to, subject, html }) => {
         html,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`Email đã được gửi thành công tới: ${to}`);
+        console.log(`Phản hồi từ Server: ${info.response}`);
+    } catch (error) {
+        console.error(`Lỗi thực tế khi Nodemailer gửi thư tới ${to}:`, error.message);
+        throw error; // Ném lỗi để AuthController bắt được
+    }
 };
 
 module.exports = sendEmail;
