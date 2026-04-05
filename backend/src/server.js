@@ -14,12 +14,8 @@ const server = http.createServer(app);
 const setupSocket = require('./socket');
 // CORS setup for multiple origins
 const allowedOrigins = [
-  process.env.CLIENT_URL,
   'https://cnpmhdt.onrender.com',
   'https://sell-motorbikes.onrender.com',
-  'https://sellmotorbikes.onrender.com',
-  'http://localhost:3000',
-  'http://localhost:5173'
 ].filter(Boolean);
 
 app.use(cors({
