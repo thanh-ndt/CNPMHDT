@@ -1,0 +1,642 @@
+[
+  {
+    "name": "Honda Vision",
+    "price": 31113000,
+    "category": "Xe ga",
+    "engineCapacity": 110,
+    "favoritesCount": 1250,
+    "images": [
+      "/images/honda_vision.png"
+    ],
+    "description": "Honda Vision là mẫu xe tay ga quốc dân mang đậm phong cách thanh lịch, nhỏ gọn và linh hoạt, cực kỳ phù hợp cho việc di chuyển hàng ngày trong đô thị.\n\nKhung dập hàn la-de eSAF thế hệ mới giúp giảm trọng lượng xe, mang lại tư thế lái thoải mái và dễ dàng xoay sở. Khối động cơ eSP thông minh không chỉ cung cấp khả năng tăng tốc mượt mà mà còn tối ưu hóa lượng nhiên liệu tiêu thụ, giúp bạn tiết kiệm chi phí tối đa trên mọi hành trình.",
+    "specifications": {
+      "dong_co": "eSP, 110cc",
+      "cong_suat": "6.59 kW",
+      "tieu_hao": "1.85 l/100km",
+      "chieu_cao_yen": "761 mm",
+      "binh_xang": "4.9 lít",
+      "phanh": "Đĩa trước, tang trống sau",
+      "cong_nghe": "eSP, eSAF, PGM-FI"
+    }
+  },
+  {
+    "name": "Honda SH Mode 125",
+    "price": 57132000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 890,
+    "images": [
+      "/images/honda_sh_mode_125.png"
+    ],
+    "description": "Xe tay ga thời trang cao cấp dành cho phái nữ, đường nét tinh xảo, động cơ eSP+ 4 van vận hành mượt mà.",
+    "specifications": {
+      "dong_co": "eSP+, 125cc",
+      "cong_suat": "8.2 kW",
+      "tieu_hao": "2.12 l/100km",
+      "chieu_cao_yen": "765 mm",
+      "binh_xang": "5.6 lít",
+      "phanh": "Phanh đĩa ABS",
+      "cong_nghe": "eSP+, CBS, PGM-FI, LED toàn phần"
+    }
+  },
+  {
+    "name": "Honda Winner X",
+    "price": 46160000,
+    "category": "Xe thể thao",
+    "engineCapacity": 150,
+    "favoritesCount": 2100,
+    "images": [
+      "/images/honda_winner_x.png"
+    ],
+    "description": "Honda Winner X là dòng xe côn tay thể thao mang đậm chất đường phố, sở hữu thiết kế khí động học sắc nét và tư thế lái hiếu chiến.\n\nĐược trang bị khối động cơ DOHC 150cc mạnh mẽ, xe mang lại khả năng bứt tốc ấn tượng và vận hành ổn định ở dải tốc độ cao. Cùng với hệ thống phanh ABS chống bó cứng an toàn và xích có phớt O-ring bền bỉ, Winner X sẵn sàng chinh phục mọi thử thách.",
+    "specifications": {
+      "dong_co": "DOHC, 150cc",
+      "cong_suat": "11.5 kW",
+      "tieu_hao": "1.98 l/100km",
+      "chieu_cao_yen": "795 mm",
+      "binh_xang": "4.5 lít",
+      "phanh": "Đĩa đơn, ABS",
+      "cong_nghe": "ABS, Smartkey, PGM-FI, Xích phớt"
+    }
+  },
+  {
+    "name": "Honda Air Blade 125",
+    "price": 42012000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 1100,
+    "images": [
+      "/images/honda_air_blade_125.png"
+    ],
+    "description": "Xe ga thể thao cho nam giới, bền bỉ, cốp rộng tiện lợi và khả năng tăng tốc ấn tượng.",
+    "specifications": {
+      "dong_co": "eSP+, 125cc",
+      "cong_suat": "8.75 kW",
+      "tieu_hao": "2.26 l/100km",
+      "chieu_cao_yen": "774 mm",
+      "binh_xang": "4.4 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "eSP+, PGM-FI, CBS, Cổng sạc USB"
+    }
+  },
+  {
+    "name": "Honda Air Blade 160",
+    "price": 56000000,
+    "category": "Xe ga",
+    "engineCapacity": 160,
+    "favoritesCount": 950,
+    "images": [
+      "/images/honda_air_blade_160.png"
+    ],
+    "description": "Phiên bản nâng cấp động cơ 160cc mạnh mẽ, trang bị ABS tiêu chuẩn cho trải nghiệm lái phấn khích.",
+    "specifications": {
+      "dong_co": "eSP+, 160cc",
+      "cong_suat": "11.2 kW",
+      "tieu_hao": "2.3 l/100km",
+      "chieu_cao_yen": "775 mm",
+      "binh_xang": "4.4 lít",
+      "phanh": "Đĩa trước, ABS",
+      "cong_nghe": "eSP+, ABS, Smart Key, PGM-FI"
+    }
+  },
+  {
+    "name": "Honda SH 125i",
+    "price": 73000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 1800,
+    "images": [
+      "/images/honda_sh_125i.png"
+    ],
+    "description": "Honda SH 125i luôn khẳng định vị thế là biểu tượng của sự sang trọng và đẳng cấp trong phân khúc xe tay ga cao cấp tại Việt Nam.\n\nThiết kế liền mạch từ đầu đến đuôi xe kết hợp hệ thống đèn LED toàn phần tạo nên diện mạo bề thế, đầy lôi cuốn. Khối động cơ eSP+ 4 van thế hệ mới mang đến sức mạnh vượt trội, kết hợp cùng hệ thống phanh ABS an toàn, giúp người lái tự tin làm chủ mọi cung đường.",
+    "specifications": {
+      "dong_co": "eSP+, 125cc",
+      "cong_suat": "9.6 kW",
+      "tieu_hao": "2.46 l/100km",
+      "chieu_cao_yen": "799 mm",
+      "binh_xang": "7.8 lít",
+      "phanh": "ABS 2 kênh",
+      "cong_nghe": "ABS, Smartkey, Bluetooth LCD, eSP+"
+    }
+  },
+  {
+    "name": "Honda SH 160i",
+    "price": 91590000,
+    "category": "Xe ga",
+    "engineCapacity": 160,
+    "favoritesCount": 3500,
+    "images": [
+      "/images/honda_sh_160i.png"
+    ],
+    "description": "Đẳng cấp xe tay ga đô thị với kiểm soát lực kéo HSTC và động cơ 160cc mạnh mẽ.",
+    "specifications": {
+      "dong_co": "eSP+, 160cc",
+      "cong_suat": "12.4 kW",
+      "tieu_hao": "2.32 l/100km",
+      "chieu_cao_yen": "799 mm",
+      "binh_xang": "7.8 lít",
+      "phanh": "ABS 2 kênh, HSTC",
+      "cong_nghe": "ABS 2 kênh, HSTC, Smartkey, Bluetooth LCD"
+    }
+  },
+  {
+    "name": "Honda Wave Alpha",
+    "price": 17859000,
+    "category": "Xe số",
+    "engineCapacity": 110,
+    "favoritesCount": 5400,
+    "images": [
+      "/images/honda_wave_alpha.png"
+    ],
+    "description": "Vua xe số bền bỉ, tiết kiệm xăng, chi phí bảo trì thấp, phù hợp mọi đối tượng.",
+    "specifications": {
+      "dong_co": "110cc",
+      "cong_suat": "6.12 kW",
+      "tieu_hao": "1.72 l/100km",
+      "chieu_cao_yen": "769 mm",
+      "binh_xang": "3.7 lít",
+      "phanh": "Cơ (Tang trống)",
+      "cong_nghe": "PGM-FI, ACG Starter"
+    }
+  },
+  {
+    "name": "Honda Future 125 FI",
+    "price": 30524000,
+    "category": "Xe số",
+    "engineCapacity": 125,
+    "favoritesCount": 1600,
+    "images": [
+      "/images/honda_future_125_fi.png"
+    ],
+    "description": "Xe số cao cấp phong cách lịch lãm, siêu tiết kiệm xăng với phun xăng điện tử PGM-FI.",
+    "specifications": {
+      "dong_co": "125cc, PGM-FI",
+      "cong_suat": "6.85 kW",
+      "tieu_hao": "1.54 l/100km",
+      "chieu_cao_yen": "756 mm",
+      "binh_xang": "4.6 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "eSP, PGM-FI, ACG Starter"
+    }
+  },
+  {
+    "name": "Yamaha Exciter 155 VVA",
+    "price": 48000000,
+    "category": "Xe thể thao",
+    "engineCapacity": 155,
+    "favoritesCount": 4200,
+    "images": [
+      "/images/yamaha_exciter_155_vva.png"
+    ],
+    "description": "Côn tay thể thao với công nghệ van biến thiên VVA, bứt tốc mạnh mẽ ở dải tốc độ cao.",
+    "specifications": {
+      "dong_co": "155cc, VVA",
+      "cong_suat": "13.2 kW",
+      "tieu_hao": "2.09 l/100km",
+      "chieu_cao_yen": "795 mm",
+      "binh_xang": "5.4 lít",
+      "phanh": "Đĩa đơn",
+      "cong_nghe": "VVA, ABS, SSS, D-MODE"
+    }
+  },
+  {
+    "name": "Honda Vario 160",
+    "price": 51990000,
+    "category": "Xe ga",
+    "engineCapacity": 160,
+    "favoritesCount": 1300,
+    "images": [
+      "/images/honda_vario_160.png"
+    ],
+    "description": "Thiết kế hầm hố, sàn để chân bằng, động cơ 160cc cho khả năng vận hành vượt trội.",
+    "specifications": {
+      "dong_co": "eSP+, 160cc",
+      "cong_suat": "11.3 kW",
+      "tieu_hao": "2.20 l/100km",
+      "chieu_cao_yen": "778 mm",
+      "binh_xang": "5.5 lít",
+      "phanh": "Đĩa ABS trước",
+      "cong_nghe": "eSP+, ABS, Smartkey, PGM-FI"
+    }
+  },
+  {
+    "name": "Honda Lead 125",
+    "price": 39500000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 600,
+    "images": [
+      "/images/honda_lead_125.png"
+    ],
+    "description": "Ông vua tiện dụng với cốp 37 lít, đổ xăng phía trước, phù hợp cho gia đình và phái nữ.",
+    "specifications": {
+      "dong_co": "eSP+, 125cc",
+      "cong_suat": "8.22 kW",
+      "tieu_hao": "2.16 l/100km",
+      "chieu_cao_yen": "760 mm",
+      "binh_xang": "6.0 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "eSP+, CBS, Smartkey, PGM-FI"
+    }
+  },
+  {
+    "name": "Yamaha Grande",
+    "price": 46000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 780,
+    "images": [
+      "/images/yamaha_grande.png"
+    ],
+    "description": "Nữ hoàng tiết kiệm xăng với động cơ Blue Core Hybrid, thiết kế Châu Âu sang trọng.",
+    "specifications": {
+      "dong_co": "125cc, Hybrid",
+      "cong_suat": "6.1 kW",
+      "tieu_hao": "1.66 l/100km",
+      "chieu_cao_yen": "790 mm",
+      "binh_xang": "4.4 lít",
+      "phanh": "Đĩa ABS",
+      "cong_nghe": "Blue Core Hybrid, ABS, Smart Battery"
+    }
+  },
+  {
+    "name": "Honda SH 350i",
+    "price": 150000000,
+    "category": "Phân khối lớn",
+    "engineCapacity": 350,
+    "favoritesCount": 450,
+    "images": [
+      "/images/honda_sh_350i.png"
+    ],
+    "description": "Đỉnh cao phân khối lớn sản xuất tại Việt Nam, động cơ mạnh mẽ thách thức mọi cung đường.",
+    "specifications": {
+      "dong_co": "350cc, eSP+",
+      "cong_suat": "21.5 kW",
+      "tieu_hao": "3.54 l/100km",
+      "chieu_cao_yen": "805 mm",
+      "binh_xang": "9.3 lít",
+      "phanh": "ABS 2 kênh",
+      "cong_nghe": "ABS 2 kênh, HSTC, Ride-by-Wire, eSP+"
+    }
+  },
+  {
+    "name": "Honda Rebel 500",
+    "price": 180000000,
+    "category": "Phân khối lớn",
+    "engineCapacity": 500,
+    "favoritesCount": 350,
+    "images": [
+      "/images/honda_rebel_500.png"
+    ],
+    "description": "Phong cách Bobber cổ điển, yên thấp, lái dễ dàng, lý tưởng cho những chuyến đi xa.",
+    "specifications": {
+      "dong_co": "500cc, 2 xy-lanh",
+      "cong_suat": "34 kW",
+      "tieu_hao": "3.42 l/100km",
+      "chieu_cao_yen": "690 mm",
+      "binh_xang": "11.2 lít",
+      "phanh": "ABS 2 kênh",
+      "cong_nghe": "ABS 2 kênh, Dual Throttle Body, DOHC"
+    }
+  },
+  {
+    "name": "Honda Super Cub C125",
+    "price": 86000000,
+    "category": "Phân khối nhỏ cổ điển",
+    "engineCapacity": 125,
+    "favoritesCount": 1400,
+    "images": [
+      "/images/honda_super_cub_c125.png"
+    ],
+    "description": "Huyền thoại tái sinh, thiết kế Retro tinh tế kết hợp khóa thông minh Smartkey hiện đại.",
+    "specifications": {
+      "dong_co": "125cc, PGM-FI",
+      "cong_suat": "6.79 kW",
+      "tieu_hao": "1.50 l/100km",
+      "chieu_cao_yen": "741 mm",
+      "binh_xang": "3.7 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "Smartkey, PGM-FI, eSP, ABS"
+    }
+  },
+  {
+    "name": "Yamaha Janus",
+    "price": 28000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 650,
+    "images": [
+      "/images/yamaha_janus.png"
+    ],
+    "description": "Xe ga năng động cho sinh viên, trọng lượng nhẹ, vận hành êm ái, màu sắc đa dạng.",
+    "specifications": {
+      "dong_co": "125cc, Blue Core",
+      "cong_suat": "7.0 kW",
+      "tieu_hao": "1.87 l/100km",
+      "chieu_cao_yen": "770 mm",
+      "binh_xang": "4.2 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "Blue Core, MIU, Blue Core SEP"
+    }
+  },
+  {
+    "name": "Yamaha NVX 155",
+    "price": 55000000,
+    "category": "Xe ga",
+    "engineCapacity": 155,
+    "favoritesCount": 820,
+    "images": [
+      "/images/yamaha_nvx_155.png"
+    ],
+    "description": "Siêu xe ga thể thao với lốp to bản, phuộc bình dầu và động cơ 155cc VVA mạnh mẽ.",
+    "specifications": {
+      "dong_co": "155cc, VVA",
+      "cong_suat": "11.3 kW",
+      "tieu_hao": "2.19 l/100km",
+      "chieu_cao_yen": "790 mm",
+      "binh_xang": "5.5 lít",
+      "phanh": "Đĩa ABS trước",
+      "cong_nghe": "VVA, ABS, Traction Control, Y-SST"
+    }
+  },
+  {
+    "name": "Yamaha Sirius FI",
+    "price": 21000000,
+    "category": "Xe số",
+    "engineCapacity": 115,
+    "favoritesCount": 1100,
+    "images": [
+      "/images/yamaha_sirius_fi.png"
+    ],
+    "description": "Mẫu xe số huyền thoại của Yamaha, động cơ FI mới bền bỉ và cực kỳ tiết kiệm xăng.",
+    "specifications": {
+      "dong_co": "115cc, FI",
+      "cong_suat": "6.4 kW",
+      "tieu_hao": "1.57 l/100km",
+      "chieu_cao_yen": "775 mm",
+      "binh_xang": "4.0 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "Fuel Injection, Blue Core, Tubeless"
+    }
+  },
+  {
+    "name": "Suzuki Raider R150",
+    "price": 50990000,
+    "category": "Xe thể thao",
+    "engineCapacity": 150,
+    "favoritesCount": 1450,
+    "images": [
+      "/images/suzuki_raider_r150.png"
+    ],
+    "description": "Vua dòng xe Hyper Underbone, động cơ DOHC mạnh mẽ cho khả năng tăng tốc vượt trội.",
+    "specifications": {
+      "dong_co": "150cc, DOHC",
+      "cong_suat": "13.6 kW",
+      "tieu_hao": "2.4 l/100km",
+      "chieu_cao_yen": "765 mm",
+      "binh_xang": "4.0 lít",
+      "phanh": "Đĩa đôi",
+      "cong_nghe": "DOHC 4-van, EFI, Slipper Clutch"
+    }
+  },
+  {
+    "name": "Suzuki Satria F150",
+    "price": 53490000,
+    "category": "Xe thể thao",
+    "engineCapacity": 150,
+    "favoritesCount": 1200,
+    "images": [
+      "/images/suzuki_satria_f150.png"
+    ],
+    "description": "Nhập khẩu nguyên chiếc từ Indonesia, phong cách thể thao, động cơ hiệu suất cao.",
+    "specifications": {
+      "dong_co": "150cc, DOHC",
+      "cong_suat": "13.6 kW",
+      "tieu_hao": "2.5 l/100km",
+      "chieu_cao_yen": "764 mm",
+      "binh_xang": "4.0 lít",
+      "phanh": "Đĩa đôi",
+      "cong_nghe": "DOHC, EFI, Antilock Braking"
+    }
+  },
+  {
+    "name": "Vespa Sprint 125",
+    "price": 81000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 2200,
+    "images": [
+      "/images/vespa_sprint_125.png"
+    ],
+    "description": "Vespa Sprint 125 kế thừa di sản thiết kế Ý vượt thời gian với thân xe bằng thép nguyên khối và cụm đèn pha chữ nhật cá tính đầy mạnh mẽ.\n\nMẫu xe này là sự kết tinh hoàn hảo giữa nét đẹp cổ điển và công nghệ hiện đại, hướng đến những cá tính trẻ trung, yêu thích sự tự do. Khối động cơ i-Get tiên tiến hoạt động cực kỳ êm ái, giảm thiểu tiếng ồn và tiết kiệm nhiên liệu, mang lại cảm giác lướt đi nhẹ nhàng trên phố.",
+    "specifications": {
+      "dong_co": "i-Get, 125cc",
+      "cong_suat": "7.9 kW",
+      "tieu_hao": "2.63 l/100km",
+      "chieu_cao_yen": "790 mm",
+      "binh_xang": "7.0 lít",
+      "phanh": "ABS đĩa trước",
+      "cong_nghe": "ABS, i-Get, Eco-Drive"
+    }
+  },
+  {
+    "name": "Vespa Primavera 125",
+    "price": 77800000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 1900,
+    "images": [
+      "/images/vespa_primavera_125.png"
+    ],
+    "description": "Vẻ đẹp vượt thời gian, đường nét bo tròn mềm mại, trang nhã, phù hợp phong cách quý phái.",
+    "specifications": {
+      "dong_co": "i-Get, 125cc",
+      "cong_suat": "7.9 kW",
+      "tieu_hao": "2.7 l/100km",
+      "chieu_cao_yen": "780 mm",
+      "binh_xang": "7.0 lít",
+      "phanh": "ABS đĩa trước",
+      "cong_nghe": "ABS, i-Get, Eco-Drive, ASR"
+    }
+  },
+  {
+    "name": "Piaggio Liberty 125",
+    "price": 58500000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 550,
+    "images": [
+      "/images/piaggio_liberty_125.png"
+    ],
+    "description": "Bánh lớn ổn định, thiết kế trẻ trung, hiện đại và trang bị ABS an toàn vượt trội.",
+    "specifications": {
+      "dong_co": "i-Get, 125cc",
+      "cong_suat": "7.6 kW",
+      "tieu_hao": "2.74 l/100km",
+      "chieu_cao_yen": "780 mm",
+      "binh_xang": "6.0 lít",
+      "phanh": "ABS đĩa trước",
+      "cong_nghe": "ABS, i-Get Engine, Smart ECO"
+    }
+  },
+  {
+    "name": "Honda CBR150R",
+    "price": 72290000,
+    "category": "Xe thể thao",
+    "engineCapacity": 150,
+    "favoritesCount": 980,
+    "images": [
+      "/images/honda_cbr150r.png"
+    ],
+    "description": "Sportbike cho người mới bắt đầu, phuộc hành trình ngược Showa và bộ ly hợp chống trượt.",
+    "specifications": {
+      "dong_co": "DOHC, 150cc",
+      "cong_suat": "12.6 kW",
+      "tieu_hao": "2.91 l/100km",
+      "chieu_cao_yen": "782 mm",
+      "binh_xang": "12 lít",
+      "phanh": "ABS 2 kênh",
+      "cong_nghe": "ABS 2 kênh, DOHC 4-van, Slipper Clutch"
+    }
+  },
+  {
+    "name": "VinFast Theon S",
+    "price": 63000000,
+    "category": "Xe điện",
+    "engineCapacity": 0,
+    "favoritesCount": 300,
+    "images": [
+      "/images/vinfast_theon_s.png"
+    ],
+    "description": "VinFast Theon S là mẫu xe máy điện thông minh cao cấp nhất, định hình lại tương lai của phương tiện di chuyển xanh tại Việt Nam.\n\nSở hữu thiết kế góc cạnh, thể thao cùng hệ thống động cơ đặt giữa truyền động bằng dây đai, xe mang đến cảm giác lái phấn khích với tốc độ tối đa lên tới 99km/h. Cùng với hệ thống pin LFP tiên tiến cho quãng đường di chuyển 150km mỗi lần sạc và công nghệ kết nối thông minh, Theon S xứng đáng là lựa chọn hoàn hảo cho giới tinh hoa.",
+    "specifications": {
+      "dong_co": "Điện 7100W",
+      "cong_suat": "9.5 HP",
+      "tieu_hao": "0 lít",
+      "chieu_cao_yen": "780 mm",
+      "binh_xang": "0 lít",
+      "phanh": "ABS 2 kênh",
+      "cong_nghe": "Motor điện 7100W, ABS, Kết nối App"
+    }
+  },
+  {
+    "name": "VinFast Feliz S",
+    "price": 27000000,
+    "category": "Xe điện",
+    "engineCapacity": 0,
+    "favoritesCount": 450,
+    "images": [
+      "/images/vinfast_feliz_s.png"
+    ],
+    "description": "Xe điện phổ thông bền bỉ, quãng đường 198km mỗi lần sạc, tiêu chuẩn chống nước IP67.",
+    "specifications": {
+      "dong_co": "Điện 1800W",
+      "cong_suat": "2.4 HP",
+      "tieu_hao": "0 lít",
+      "chieu_cao_yen": "770 mm",
+      "binh_xang": "0 lít",
+      "phanh": "Đĩa trước",
+      "cong_nghe": "Motor Brushless, IP67, Sạc tiêu chuẩn"
+    }
+  },
+  {
+    "name": "Honda CB150R",
+    "price": 105500000,
+    "category": "Xe thể thao",
+    "engineCapacity": 150,
+    "favoritesCount": 500,
+    "images": [
+      "/images/honda_cb150r.png"
+    ],
+    "description": "Phong cách Neo Sports Café cổ điển kết hợp hiện đại, trang bị cao cấp, lái cực chất.",
+    "specifications": {
+      "dong_co": "150cc, DOHC",
+      "cong_suat": "12 kW",
+      "tieu_hao": "2.5 l/100km",
+      "chieu_cao_yen": "795 mm",
+      "binh_xang": "8.5 lít",
+      "phanh": "ABS đĩa đơn",
+      "cong_nghe": "ABS 2 kênh, DOHC, Neo Sports Café"
+    }
+  },
+  {
+    "name": "SYM Attila 125",
+    "price": 33000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 200,
+    "images": [
+      "/images/sym_attila_125.png"
+    ],
+    "description": "Sự trở lại của huyền thoại, thiết kế cổ điển sang trọng, động cơ EFI 125cc êm ái.",
+    "specifications": {
+      "dong_co": "125cc, EFI",
+      "cong_suat": "7.7 kW",
+      "tieu_hao": "2.3 l/100km",
+      "chieu_cao_yen": "750 mm",
+      "binh_xang": "6.2 lít",
+      "phanh": "CBS trước sau",
+      "cong_nghe": "EFI, CBS, ACG Starter"
+    }
+  },
+  {
+    "name": "SYM Star SR 125",
+    "price": 28000000,
+    "category": "Xe số",
+    "engineCapacity": 125,
+    "favoritesCount": 150,
+    "images": [
+      "/images/sym_star_sr_125.png"
+    ],
+    "description": "Xe số thể thao với kiểu dáng góc cạnh, trang bị phanh đĩa cho cả hai bánh an toàn.",
+    "specifications": {
+      "dong_co": "125cc, Ecotech",
+      "cong_suat": "6.2 kW",
+      "tieu_hao": "1.8 l/100km",
+      "chieu_cao_yen": "780 mm",
+      "binh_xang": "4.2 lít",
+      "phanh": "Đĩa đôi",
+      "cong_nghe": "Ecotech EFI, Đĩa đôi, ACG Starter"
+    }
+  },
+  {
+    "name": "Honda Blade 110",
+    "price": 19000000,
+    "category": "Xe số",
+    "engineCapacity": 110,
+    "favoritesCount": 700,
+    "images": [
+      "/images/honda_blade_110.png"
+    ],
+    "description": "Gọn gàng, sắc sảo, vận hành mạnh mẽ, đây là lựa chọn xe số tối ưu cho sinh viên.",
+    "specifications": {
+      "dong_co": "110cc",
+      "cong_suat": "6.18 kW",
+      "tieu_hao": "1.85 l/100km",
+      "chieu_cao_yen": "769 mm",
+      "binh_xang": "3.7 lít",
+      "phanh": "Cơ/Đĩa",
+      "cong_nghe": "PGM-FI, eSP, ACG Starter"
+    }
+  },
+  {
+    "name": "Honda Vario 125",
+    "price": 41000000,
+    "category": "Xe ga",
+    "engineCapacity": 125,
+    "favoritesCount": 1200,
+    "images": [
+      "/images/honda_vario_125.png"
+    ],
+    "description": "Mẫu xe nhập khẩu được phân phối chính hãng, thiết kế trẻ trung, phù hợp đô thị.",
+    "specifications": {
+      "dong_co": "eSP, 125cc",
+      "cong_suat": "8.2 kW",
+      "tieu_hao": "2.16 l/100km",
+      "chieu_cao_yen": "769 mm",
+      "binh_xang": "5.5 lít",
+      "phanh": "Đĩa trước CBS",
+      "cong_nghe": "eSP, CBS, Smartkey, PGM-FI"
+    }
+  }
+]
