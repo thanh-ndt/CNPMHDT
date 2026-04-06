@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
+import api from '../api/axiosConfig';
 import { logout } from '../redux/authSlice';
+
 import { notificationApi } from '../api/notificationApi';
 import './css/Header.css';
 
@@ -45,8 +46,9 @@ const Header = () => {
         const delayDebounceTimeout = setTimeout(async () => {
             if (searchTerm.trim().length > 0) {
                 try {
-                    const res = await axios.get(`https://cnpmhdt.onrender.com/api/vehicles/suggestions?keyword=${encodeURIComponent(searchTerm)}`);
+                    const res = await api.get(`/vehicles/suggestions?keyword=${encodeURIComponent(searchTerm)}`);
                     if (res.data.success) {
+
                         setSuggestions(res.data.data);
                         setShowDropdown(true);
                     }
@@ -144,7 +146,9 @@ const Header = () => {
                             <Link to="/" className={`hdr-nav-item ${location.pathname === '/' ? 'hdr-nav-active' : ''}`}>Trang chủ</Link>
                             <Link to="/products" className={`hdr-nav-item ${location.pathname === '/products' || location.pathname.startsWith('/product/') ? 'hdr-nav-active' : ''}`}>Sản phẩm</Link>
                             <Link to="/promotions" className={`hdr-nav-item ${location.pathname === '/promotions' ? 'hdr-nav-active' : ''}`}>Khuyến mãi</Link>
+                            <Link to="/about" className={`hdr-nav-item ${location.pathname === '/about' ? 'hdr-nav-active' : ''}`}>Giới thiệu</Link>
                             <Link to="/schedule-viewing" className={`hdr-nav-item ${location.pathname === '/schedule-viewing' ? 'hdr-nav-active' : ''}`}>Đặt lịch xem xe</Link>
+
                             <Link to="/cart" className={`hdr-nav-item ${location.pathname === '/cart' ? 'hdr-nav-active' : ''}`}>Giỏ hàng</Link>
                         </nav>
 
