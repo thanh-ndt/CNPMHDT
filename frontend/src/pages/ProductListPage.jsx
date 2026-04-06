@@ -1,3 +1,17 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * PRODUCT LIST PAGE - TRANG DANH SÁCH SẢN PHẨM
+ * ═══════════════════════════════════════════════════════════════
+ * Trang này hiển thị danh sách xe với các tính năng:
+ * - Tìm kiếm theo từ khóa (từ URL param)
+ * - Lọc theo loại xe, khoảng giá, phân khối
+ * - Lọc theo hãng xe (từ URL param)
+ * - Phân trang kết quả
+ * - So sánh tối đa 3 xe
+ * - Thêm xe vào giỏ hàng
+ * ═══════════════════════════════════════════════════════════════
+ */
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +23,7 @@ import FilterSidebar from '../components/FilterSidebar';
 import ProductGrid from '../components/ProductGrid';
 import CompareModal from '../components/CompareModal';
 
+// Danh sách các loại xe có sẵn để lọc
 const AVAILABLE_CATEGORIES = ['Xe ga', 'Xe số', 'Xe thể thao', 'Phân khối lớn', 'Xe điện'];
 
 export default function ProductListPage() {
@@ -18,29 +33,59 @@ export default function ProductListPage() {
     const { user } = useSelector((state) => state.auth);
     const customerEmail = user?.email;
 
-    // Data
-    const [vehicles, setVehicles] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    // ═══════════════════════════════════════════════════════════
+    // STATE QUẢN LÝ DỮ LIỆU XE
+    // ═══════════════════════════════════════════════════════════
+    const [vehicles, setVehicles] = useState([]);           // Danh sách xe hiện tại
+    const [loading, setLoading] = useState(true);           // Trạng thái đang tải
+    const [pagination, setPagination] = useState({ 
+        currentPage: 1, 
+        totalPages: 1 
+    });                                                      // Thông tin phân trang
 
-    // Filters
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [pendingMin, setPendingMin] = useState('');
-    const [pendingMax, setPendingMax] = useState('');
-    const [appliedMin, setAppliedMin] = useState('');
-    const [appliedMax, setAppliedMax] = useState('');
-    const [engineFilter, setEngineFilter] = useState('');
+    // ═══════════════════════════════════════════════════════════
+    // STATE QUẢN LÝ BỘ LỌC
+    // ═══════════════════════════════════════════════════════════
+    const [selectedCategories, setSelectedCategories] = useState([]);  // Các loại xe đã chọn
+    const [pendingMin, setPendingMin] = useState('');                  // Giá tối thiểu đang nhập
+    const [pendingMax, setPendingMax] = useState('');                  // Giá tối đa đang nhập
+    const [appliedMin, setAppliedMin] = useState('');                  // Giá tối thiểu đã áp dụng
+    const [appliedMax, setAppliedMax] = useState('');                  // Giá tối đa đã áp dụng
+    const [engineFilter, setEngineFilter] = useState('');              // Bộ lọc phân khối (small/large)
 
-    // Compare
-    const [isCompareMode, setIsCompareMode] = useState(false);
-    const [compareIds, setCompareIds] = useState([]);
-    const [showCompareModal, setShowCompareModal] = useState(false);
+    // ═══════════════════════════════════════════════════════════
+    // STATE QUẢN LÝ CHỨC NĂNG SO SÁNH
+    // ═══════════════════════════════════════════════════════════
+    const [isCompareMode, setIsCompareMode] = useState(false);         // Chế độ so sánh có bật không
+    const [compareIds, setCompareIds] = useState([]);                  // Danh sách ID xe đã chọn để so sánh
+    const [showCompareModal, setShowCompareModal] = useState(false);   // Hiển thị modal chọn xe so sánh
 
-    const searchTerm = searchParams.get('search') || '';
-    const brandId = searchParams.get('brand') || '';
+    // ═══════════════════════════════════════════════════════════
+    // LẤY THAM SỐ TÌM KIẾM TỪ URL
+    // ═══════════════════════════════════════════════════════════
+    const searchTerm = searchParams.get('search') || '';  // Từ khóa tìm kiếm từ URL: ?search=...
+    const brandId = searchParams.get('brand') || '';      // ID hãng xe từ URL: ?brand=...
 
+    /**
+     * ═══════════════════════════════════════════════════════════
+     * HÀM TẢI DỮ LIỆU XE TỪ SERVER
+     * ═══════════════════════════════════════════════════════════
+     * Hàm này gọi API để lấy danh sách xe dựa trên các bộ lọc hiện tại
+     * 
+     * @param {number} page - Số trang cần tải (mặc định = 1)
+     * 
+     * Các bộ lọc được áp dụng:
+     * - searchTerm: Từ khóa tìm kiếm từ URL
+     * - selectedCategories: Các loại xe đã chọn
+     * - appliedMin/appliedMax: Khoảng giá đã áp dụng
+     * - engineFilter: Phân khối động cơ
+     * - brandId: Hãng xe từ URL
+     * ═══════════════════════════════════════════════════════════
+     */
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
+        
+        // Xây dựng object params để gửi lên API
         const params = { page, limit: 8 };
         if (searchTerm) params.search = searchTerm;
         if (selectedCategories.length > 0) params.category = selectedCategories.join(',');
@@ -49,6 +94,7 @@ export default function ProductListPage() {
         if (engineFilter) params.engine = engineFilter;
         if (brandId) params.brand = brandId;
 
+        // Gọi API qua vehicleService
         const res = await vehicleService.fetchVehiclesData(params);
         if (res.success) {
             setVehicles(res.data);
@@ -57,26 +103,47 @@ export default function ProductListPage() {
         setLoading(false);
     }, [searchTerm, selectedCategories, appliedMin, appliedMax, engineFilter, brandId]);
 
+    // Tự động tải dữ liệu khi component mount hoặc khi các dependency thay đổi
     useEffect(() => {
         fetchData(1);
     }, [fetchData]);
 
-    // Filter handlers
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ CÁC THAO TÁC VỚI BỘ LỌC
+    // ═══════════════════════════════════════════════════════════
+    
+    /**
+     * Bật/tắt lọc theo loại xe
+     * Nếu loại xe đã được chọn -> bỏ chọn
+     * Nếu chưa được chọn -> thêm vào danh sách chọn
+     */
     const toggleCategory = (cat) => {
         setSelectedCategories((prev) =>
             prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
         );
     };
 
+    /**
+     * Áp dụng bộ lọc giá
+     * Chuyển giá từ trạng thái "đang nhập" sang "đã áp dụng"
+     * để kích hoạt tìm kiếm lại
+     */
     const handleApplyPrice = () => {
         setAppliedMin(pendingMin);
         setAppliedMax(pendingMax);
     };
 
+    /**
+     * Thay đổi bộ lọc phân khối động cơ
+     * Click lại vào cùng một option sẽ bỏ chọn (toggle behavior)
+     */
     const handleEngineChange = (val) => {
         setEngineFilter((prev) => (prev === val ? '' : val));
     };
 
+    /**
+     * Xóa tất cả bộ lọc, reset về trạng thái ban đầu
+     */
     const handleResetFilters = () => {
         setSelectedCategories([]);
         setPendingMin('');
@@ -86,29 +153,56 @@ export default function ProductListPage() {
         setEngineFilter('');
     };
 
+    /**
+     * Chuyển trang và cuộn về đầu trang
+     */
     const handlePageChange = (page) => {
         fetchData(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Compare handlers
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ CHỨC NĂNG SO SÁNH XE
+    // ═══════════════════════════════════════════════════════════
+    
+    /**
+     * Thêm/bỏ xe khỏi danh sách so sánh
+     * Giới hạn tối đa 3 xe có thể so sánh cùng lúc
+     */
     const toggleCompare = (item) => {
         setCompareIds((prev) => {
             const exists = prev.some((c) => (c.id || c) === (item.id || item));
+            // Nếu xe đã được chọn -> bỏ chọn
             if (exists) return prev.filter((c) => (c.id || c) !== (item.id || item));
+            
+            // Nếu đã chọn đủ 3 xe -> không cho chọn thêm
             if (prev.length >= 3) {
                 alert('Bạn chỉ được chọn tối đa 3 sản phẩm để so sánh!');
                 return prev;
             }
+            
+            // Thêm xe vào danh sách so sánh
             return [...prev, item];
         });
     };
 
+    /**
+     * Chuyển đến trang so sánh với các xe đã chọn
+     * URL sẽ có dạng: /compare?ids=id1,id2,id3
+     */
     const goToCompare = () => {
         const ids = compareIds.map((c) => c.id || c).join(',');
         navigate(`/compare?ids=${ids}`);
     };
 
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ THÊM XE VÀO GIỎ HÀNG
+    // ═══════════════════════════════════════════════════════════
+    
+    /**
+     * Thêm xe vào giỏ hàng
+     * Yêu cầu người dùng phải đăng nhập
+     */
     const handleAddToCart = async (vehicleId) => {
         if (!customerEmail) {
             alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');

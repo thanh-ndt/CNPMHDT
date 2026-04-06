@@ -1,3 +1,21 @@
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * HEADER COMPONENT - THANH ĐIỀU HƯỚNG VÀ TÌM KIẾM
+ * ═══════════════════════════════════════════════════════════════
+ * Component Header chứa:
+ * - Thanh điều hướng các trang chính
+ * - Thanh tìm kiếm với autocomplete
+ * - Thông báo người dùng
+ * - Menu tài khoản người dùng
+ * 
+ * Tính năng tìm kiếm:
+ * - Autocomplete suggestions khi nhập (debounce 300ms)
+ * - Gợi ý bao gồm cả hãng xe và sản phẩm xe
+ * - Click vào gợi ý: Chuyển đến trang chi tiết (xe) hoặc lọc theo hãng (brand)
+ * - Submit form: Chuyển đến trang danh sách với từ khóa tìm kiếm
+ * ═══════════════════════════════════════════════════════════════
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,31 +25,45 @@ import { notificationApi } from '../api/notificationApi';
 import './css/Header.css';
 
 const Header = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [showUserMenu, setShowUserMenu] = useState(false);
-    const [showNotifMenu, setShowNotifMenu] = useState(false);
-    const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
+    // ═══════════════════════════════════════════════════════════
+    // STATE QUẢN LÝ TÌM KIẾM VÀ AUTOCOMPLETE
+    // ═══════════════════════════════════════════════════════════
+    const [searchTerm, setSearchTerm] = useState('');        // Từ khóa đang nhập trong ô tìm kiếm
+    const [suggestions, setSuggestions] = useState([]);      // Danh sách gợi ý autocomplete
+    const [showDropdown, setShowDropdown] = useState(false); // Hiển thị dropdown gợi ý
+    
+    // ═══════════════════════════════════════════════════════════
+    // STATE QUẢN LÝ MENU VÀ THÔNG BÁO
+    // ═══════════════════════════════════════════════════════════
+    const [showUserMenu, setShowUserMenu] = useState(false);     // Hiển thị menu người dùng
+    const [showNotifMenu, setShowNotifMenu] = useState(false);   // Hiển thị menu thông báo
+    const [notifications, setNotifications] = useState([]);      // Danh sách thông báo
+    const [unreadCount, setUnreadCount] = useState(0);           // Số thông báo chưa đọc
 
     const { token, user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // Refs để xử lý click outside
     const searchRef = useRef(null);
     const notifRef = useRef(null);
 
-    // Close dropdowns if clicked outside
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ ĐÓNG DROPDOWN KHI CLICK OUTSIDE
+    // ═══════════════════════════════════════════════════════════
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Đóng dropdown tìm kiếm nếu click bên ngoài
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
             }
+            // Đóng menu người dùng nếu click bên ngoài
             if (!event.target.closest('.hdr-user-menu-container')) {
                 setShowUserMenu(false);
             }
+            // Đóng menu thông báo nếu click bên ngoài
             if (notifRef.current && !notifRef.current.contains(event.target)) {
                 setShowNotifMenu(false);
             }
@@ -40,11 +72,16 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Debounce API call for suggestions
+    // ═══════════════════════════════════════════════════════════
+    // DEBOUNCE API CALL CHO AUTOCOMPLETE SUGGESTIONS
+    // ═══════════════════════════════════════════════════════════
+    // Khi người dùng nhập, đợi 300ms rồi mới gọi API
+    // Tránh gọi API quá nhiều lần khi đang gõ
     useEffect(() => {
         const delayDebounceTimeout = setTimeout(async () => {
             if (searchTerm.trim().length > 0) {
                 try {
+                    // Gọi API GET /api/vehicles/suggestions với từ khóa
                     const res = await axios.get(`https://cnpmhdt.onrender.com/api/vehicles/suggestions?keyword=${encodeURIComponent(searchTerm)}`);
                     if (res.data.success) {
                         setSuggestions(res.data.data);
@@ -54,10 +91,11 @@ const Header = () => {
                     console.error("Lỗi fetch gợi ý:", error);
                 }
             } else {
+                // Xóa gợi ý nếu ô tìm kiếm trống
                 setSuggestions([]);
                 setShowDropdown(false);
             }
-        }, 300); // 300ms debounce
+        }, 300); // Debounce 300ms - chỉ gọi API sau khi người dùng ngừng gõ 300ms
 
         return () => clearTimeout(delayDebounceTimeout);
     }, [searchTerm]);
@@ -106,6 +144,13 @@ const Header = () => {
         }
     };
 
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ SUBMIT FORM TÌM KIẾM
+    // ═══════════════════════════════════════════════════════════
+    /**
+     * Khi người dùng nhấn Enter hoặc click nút Search
+     * Chuyển hướng đến trang danh sách sản phẩm với query param ?search=...
+     */
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchTerm.trim()) {
@@ -114,12 +159,23 @@ const Header = () => {
         }
     };
 
+    // ═══════════════════════════════════════════════════════════
+    // XỬ LÝ CLICK VÀO GỢI Ý AUTOCOMPLETE
+    // ═══════════════════════════════════════════════════════════
+    /**
+     * Xử lý khi người dùng click vào một gợi ý
+     * - Nếu là xe (type='vehicle'): Chuyển đến trang chi tiết xe
+     * - Nếu là hãng (type='brand'): Chuyển đến trang danh sách lọc theo hãng
+     */
     const handleSuggestionClick = (item) => {
         setSearchTerm('');
         setShowDropdown(false);
+        
         if (item.type === 'vehicle') {
+            // Chuyển đến trang chi tiết sản phẩm
             navigate(`/product/${item._id}`);
         } else if (item.type === 'brand') {
+            // Chuyển đến trang danh sách với filter theo hãng
             navigate(`/products?brand=${item._id}`);
         }
     };
@@ -148,8 +204,11 @@ const Header = () => {
                             <Link to="/cart" className={`hdr-nav-item ${location.pathname === '/cart' ? 'hdr-nav-active' : ''}`}>Giỏ hàng</Link>
                         </nav>
 
-                        {/* Thanh tìm kiếm */}
+                        {/* ═══════════════════════════════════════════════ */}
+                        {/* THANH TÌM KIẾM VỚI AUTOCOMPLETE */}
+                        {/* ═══════════════════════════════════════════ */}
                         <div className="hdr-search-container" ref={searchRef}>
+                            {/* Form tìm kiếm - submit để chuyển trang */}
                             <form className="hdr-search-form" onSubmit={handleSearch}>
                                 <input
                                     type="text"
@@ -167,7 +226,10 @@ const Header = () => {
                                 </button>
                             </form>
 
-                            {/* Dropdown Gợi ý kết quả */}
+                            {/* ───────────────────────────────────────── */}
+                            {/* DROPDOWN GỢI Ý AUTOCOMPLETE */}
+                            {/* ───────────────────────────────────────── */}
+                            {/* Hiển thị khi có gợi ý và dropdown được bật */}
                             {showDropdown && suggestions.length > 0 && (
                                 <div className="hdr-suggestions-dropdown">
                                     {suggestions.map((item) => (
@@ -176,6 +238,7 @@ const Header = () => {
                                             className="hdr-suggestion-item"
                                             onClick={() => handleSuggestionClick(item)}
                                         >
+                                            {/* Hình ảnh xe hoặc logo hãng */}
                                             <img
                                                 src={item.images && item.images[0] ? item.images[0] : ''}
                                                 alt={item.name}
@@ -185,6 +248,7 @@ const Header = () => {
                                             <div className="hdr-sug-info">
                                                 <div className="hdr-sug-name">
                                                     {item.name}
+                                                    {/* Badge phân biệt loại: Hãng xe hoặc Sản phẩm */}
                                                     {item.type === 'brand' ? (
                                                         <span className="badge bg-info text-dark ms-2" style={{ fontSize: '10px' }}>Hãng xe</span>
                                                     ) : (
@@ -192,6 +256,7 @@ const Header = () => {
                                                     )}
                                                 </div>
                                                 <div className="hdr-sug-price">
+                                                    {/* Hiển thị giá cho xe, text cho hãng */}
                                                     {item.type === 'vehicle' ? (item.formattedPrice || 'Liên hệ') : 'Xem tất cả sản phẩm'}
                                                 </div>
                                             </div>
@@ -200,6 +265,7 @@ const Header = () => {
                                 </div>
                             )}
 
+                            {/* Hiển thị thông báo khi không tìm thấy kết quả */}
                             {showDropdown && searchTerm.length > 0 && suggestions.length === 0 && (
                                 <div className="hdr-suggestions-dropdown empty">
                                     <div className="hdr-suggestion-item non-clickable">Không tìm thấy xe phù hợp</div>
