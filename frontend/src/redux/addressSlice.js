@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_BASE_URL } from '../api/axiosConfig';
 
-const API_URL = 'https://cnpmhdt.onrender.com/api/addresses';
+
+const API_URL = `${API_BASE_URL}/addresses`;
+
 
 // Async thunk: Lấy danh sách địa chỉ của khách hàng từ DB
 export const fetchAddresses = createAsyncThunk(

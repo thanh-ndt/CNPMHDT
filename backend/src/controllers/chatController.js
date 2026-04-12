@@ -40,7 +40,7 @@ const getRoomMessages = async (req, res) => {
 const getCustomerRoomInfo = async (req, res) => {
     try {
         const { customerId } = req.params;
-        // Tìm 1 admin/owner bất kỳ trong hệ thống
+        // Tìm 1 admin bất kỳ trong hệ thống
         const owner = await User.findOne({ role: 'owner' });
         if (!owner) return res.status(404).json({ success: false, message: 'Hệ thống chưa có tài khoản Owner/Admin' });
         

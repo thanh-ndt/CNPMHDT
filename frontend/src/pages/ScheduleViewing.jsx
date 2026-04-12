@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import api from '../api/axiosConfig';
+
 
 const ScheduleViewing = () => {
   const navigate = useNavigate();
@@ -30,8 +31,9 @@ const ScheduleViewing = () => {
     // Lấy danh sách xe thật từ DB
     const fetchVehicles = async () => {
         try {
-            const res = await axios.get('https://cnpmhdt.onrender.com/api/vehicles/all-list');
+            const res = await api.get('/vehicles/all-list');
             if (res.data.success) {
+
                 setVehicles(res.data.data);
             }
         } catch(err) {
@@ -42,8 +44,9 @@ const ScheduleViewing = () => {
         if (!user?._id) return;
         setFetchingHistory(true);
         try {
-            const res = await axios.get(`https://cnpmhdt.onrender.com/api/appointments/customer/${user._id}`);
+            const res = await api.get(`/appointments/customer/${user._id}`);
             if (res.data.success) {
+
                 setAppointmentHistory(res.data.data);
             }
         } catch (err) {
@@ -87,8 +90,9 @@ const ScheduleViewing = () => {
             payload.guestEmail = formData.guestEmail;
         }
 
-        const res = await axios.post('https://cnpmhdt.onrender.com/api/appointments', payload);
+        const res = await api.post('/appointments', payload);
         if (res.data.success) {
+
             setSuccess(true);
             setFormData({
                 guestName: '',
@@ -101,9 +105,10 @@ const ScheduleViewing = () => {
             });
             if (user) {
                 // Refresh history after new booking
-                const historyRes = await axios.get(`https://cnpmhdt.onrender.com/api/appointments/customer/${user._id}`);
+                const historyRes = await api.get(`/appointments/customer/${user._id}`);
                 if (historyRes.data.success) setAppointmentHistory(historyRes.data.data);
             }
+
             setTimeout(() => setSuccess(false), 5000);
         }
     } catch (err) {

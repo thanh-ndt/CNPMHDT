@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Table, Spinner, Alert, Button, Modal, Form } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axiosConfig';
 import { useSelector } from 'react-redux';
+
 import { orderApi } from '../api/orderApi';
 import { returnApi } from '../api/returnApi';
 import { reviewApi } from '../api/reviewApi';
@@ -32,8 +33,9 @@ const OrderDetail = () => {
     useEffect(() => {
         const fetchOrderDetail = async () => {
             try {
-                const res = await axios.get(`https://cnpmhdt.onrender.com/api/orders/${id}`);
+                const res = await api.get(`/orders/${id}`);
                 if (res.data.success) {
+
                     setOrderData(res.data.data);
                 } else {
                     setError('Không thể tải chi tiết đơn hàng.');

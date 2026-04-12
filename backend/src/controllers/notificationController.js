@@ -29,7 +29,7 @@ const getNotifications = async (req, res) => {
 // POST /api/notifications — Tạo thông báo cho user
 const createNotification = async (req, res) => {
     try {
-        const { userId, title, message } = req.body;
+        const { userId, title, message, type, link } = req.body;
 
         if (!userId || !title || !message) {
             return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
@@ -38,7 +38,9 @@ const createNotification = async (req, res) => {
         const notification = new Notification({
             owner: userId,
             title,
-            message
+            message,
+            type: type || 'SYSTEM',
+            link: link || ''
         });
 
         await notification.save();
@@ -75,4 +77,29 @@ const markAllRead = async (req, res) => {
     }
 };
 
-module.exports = { getNotifications, createNotification, markAllRead };
+// PUT /api/notifications/:id/mark-read — Đánh dấu 1 thông báo là đã đọc
+const markRead = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'ID không hợp lệ' });
+        }
+
+        const notification = await Notification.findByIdAndUpdate(
+            id,
+            { $set: { isRead: true } },
+            { new: true }
+        );
+
+        if (!notification) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy thông báo' });
+        }
+
+        res.json({ success: true, data: notification });
+    } catch (error) {
+        console.error('Lỗi markRead:', error);
+        res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
+module.exports = { getNotifications, createNotification, markAllRead, markRead };

@@ -102,9 +102,46 @@ const Header = () => {
     };
 
     const handleNotifClick = () => {
-        setShowNotifMenu(true);
-        if (unreadCount > 0) {
-            handleMarkAllRead();
+        setShowNotifMenu(!showNotifMenu);
+    };
+
+    const handleNotifItemClick = async (notif) => {
+        // Close menu
+        setShowNotifMenu(false);
+
+        // Mark as read if unread
+        if (!notif.isRead) {
+            try {
+                const res = await notificationApi.markRead(notif._id);
+                if (res.success) {
+                    // Update local state
+                    setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+                    setUnreadCount(prev => Math.max(0, prev - 1));
+                }
+            } catch (error) {
+                console.error("Lỗi khi đánh dấu thông báo đã đọc:", error);
+            }
+        }
+
+        // Navigate to appropriate page
+        if (notif.link) {
+            navigate(notif.link);
+        } else {
+            // Default based on type if no specific link
+            switch (notif.type) {
+                case 'ORDER':
+                    navigate('/orders');
+                    break;
+                case 'PROMOTION':
+                    navigate('/promotions');
+                    break;
+                case 'PROFILE':
+                    navigate('/profile');
+                    break;
+                default:
+                    // Maybe just stay or go to home
+                    break;
+            }
         }
     };
 
@@ -241,15 +278,27 @@ const Header = () => {
                                         {/* Dropdown thông báo gắn liền bên dưới chuông */}
                                         {showNotifMenu && (
                                             <div className="hdr-notif-dropdown">
-                                                <div className="hdr-notif-dropdown-header">
+                                                <div className="hdr-notif-dropdown-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <span><i className="bi bi-bell-fill" style={{ color: '#cc0000', marginRight: '8px' }}></i>Thông báo của bạn</span>
+                                                    {unreadCount > 0 && (
+                                                        <span 
+                                                            onClick={(e) => { e.stopPropagation(); handleMarkAllRead(); }} 
+                                                            style={{ fontSize: '11px', color: '#cc0000', cursor: 'pointer', fontWeight: '500' }}
+                                                        >
+                                                            Đánh dấu tất cả đã đọc
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div className="hdr-notif-dropdown-body">
                                                     {notifications.length > 0 ? (
                                                         notifications.map(notif => (
-                                                            <div key={notif._id} className="hdr-notif-item">
+                                                            <div
+                                                                key={notif._id}
+                                                                className={`hdr-notif-item ${notif.isRead ? '' : 'unread'}`}
+                                                                onClick={() => handleNotifItemClick(notif)}
+                                                            >
                                                                 <div className="hdr-notif-icon">
-                                                                    <i className="bi bi-bell"></i>
+                                                                    <i className={notif.type === 'ORDER' ? "bi bi-box-seam" : "bi bi-bell"}></i>
                                                                 </div>
                                                                 <div className="hdr-notif-content">
                                                                     <div className="hdr-notif-title">{notif.title}</div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
-import axios from 'axios';
+import api, { SOCKET_URL } from '../api/axiosConfig';
 import { Button, Card, Form, ListGroup } from 'react-bootstrap';
+
 
 const ChatWidget = () => {
     const { user } = useSelector(state => state.auth);
@@ -19,12 +20,13 @@ const ChatWidget = () => {
     const [rooms, setRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);
-    
     useEffect(() => {
         if (!user) return;
         
-        const newSocket = io('https://cnpmhdt.onrender.com');
+        const newSocket = io(SOCKET_URL);
         setSocket(newSocket);
+
+
 
         // Lắng nghe custom event từ các component khác để mở chat
         const openChat = () => setIsOpen(true);
@@ -42,18 +44,21 @@ const ChatWidget = () => {
         const fetchInitData = async () => {
             try {
                 if (user.role === 'owner') {
-                    const res = await axios.get(`https://cnpmhdt.onrender.com/api/chat/rooms?userId=${user._id}&role=owner`);
+                    const res = await api.get(`/chat/rooms?userId=${user._id}&role=owner`);
                     if (res.data.success) {
+
                         setRooms(res.data.data);
                     }
                 } else {
-                    const res = await axios.get(`https://cnpmhdt.onrender.com/api/chat/customer-room/${user._id}`);
+                    const res = await api.get(`/chat/customer-room/${user._id}`);
                     if (res.data.success) {
+
                         const rId = res.data.data._id;
                         setRoomId(rId);
                         
-                        const msgs = await axios.get(`https://cnpmhdt.onrender.com/api/chat/messages/${rId}`);
+                        const msgs = await api.get(`/chat/messages/${rId}`);
                         if (msgs.data.success) {
+
                             setMessages(msgs.data.data);
                         }
                     }
@@ -113,8 +118,9 @@ const ChatWidget = () => {
         setRoomId(room._id);
         setSelectedRoom(room);
         try {
-            const msgs = await axios.get(`https://cnpmhdt.onrender.com/api/chat/messages/${room._id}`);
+            const msgs = await api.get(`/chat/messages/${room._id}`);
             if (msgs.data.success) {
+
                 setMessages(msgs.data.data);
             }
         } catch(err) {

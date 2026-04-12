@@ -24,6 +24,15 @@ const notificationSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false
+    },
+    type: {
+      type: String,
+      enum: ['ORDER', 'PROMOTION', 'SYSTEM', 'CHAT', 'FAVORITE'],
+      default: 'SYSTEM',
+    },
+    link: {
+      type: String,
+      trim: true,
     }
   },
   {
