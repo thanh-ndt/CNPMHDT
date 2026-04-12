@@ -105,41 +105,63 @@ const Header = () => {
         setShowNotifMenu(!showNotifMenu);
     };
 
-    const handleNotifItemClick = async (notif) => {
-        // Close menu
+    const handleNotifItemClick = (notif) => {
+        if (!notif) return;
+        
+        console.log("Notification clicked:", notif);
+        
+        // 1. Close menu immediately for smoothness
         setShowNotifMenu(false);
 
-        // Mark as read if unread
+        // 2. Mark as read in background (Don't await it to avoid blocking navigation)
         if (!notif.isRead) {
-            try {
-                const res = await notificationApi.markRead(notif._id);
-                if (res.success) {
-                    // Update local state
-                    setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
-                    setUnreadCount(prev => Math.max(0, prev - 1));
-                }
-            } catch (error) {
-                console.error("Lỗi khi đánh dấu thông báo đã đọc:", error);
-            }
+            notificationApi.markRead(notif._id || notif.id)
+                .then(res => {
+                    if (res.success) {
+                        setNotifications(prev => prev.map(n => (n._id === notif._id || n.id === notif.id) ? { ...n, isRead: true } : n));
+                        setUnreadCount(prev => Math.max(0, prev - 1));
+                    }
+                })
+                .catch(err => console.error("Lỗi khi đánh dấu đã đọc:", err));
         }
 
-        // Navigate to appropriate page
-        if (notif.link) {
-            navigate(notif.link);
+        // 3. Determine destination
+        const link = notif.link;
+        const type = (notif.type || '').toUpperCase();
+        
+        console.log("Processing navigation - Link:", link, "Type:", type);
+
+        if (link && link !== '#') {
+            console.log("Navigating to direct link:", link);
+            navigate(link);
         } else {
-            // Default based on type if no specific link
-            switch (notif.type) {
+            console.log("Determining link by type...");
+            switch (type) {
                 case 'ORDER':
                     navigate('/orders');
+                    break;
+                case 'APPOINTMENT':
+                    navigate('/schedule-viewing');
                     break;
                 case 'PROMOTION':
                     navigate('/promotions');
                     break;
                 case 'PROFILE':
+                case 'USER':
                     navigate('/profile');
                     break;
+                case 'CHAT':
+                    // If you have a chat page
+                    navigate('/chat'); 
+                    break;
                 default:
-                    // Maybe just stay or go to home
+                    console.warn("No defined route for notification type:", type);
+                    // If order status update but switch fails, a fallback check of message content
+                    if (notif.title?.toLowerCase().includes('đơn hàng') || notif.message?.toLowerCase().includes('đơn hàng')) {
+                        navigate('/orders');
+                    } else if (notif.title?.toLowerCase().includes('hẹn') || notif.message?.toLowerCase().includes('hẹn')) {
+                        navigate('/schedule-viewing');
+                    }
                     break;
             }
         }

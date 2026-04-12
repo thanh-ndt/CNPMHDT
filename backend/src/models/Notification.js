@@ -27,7 +27,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['ORDER', 'PROMOTION', 'SYSTEM', 'CHAT', 'FAVORITE'],
+      enum: ['ORDER', 'PROMOTION', 'SYSTEM', 'CHAT', 'FAVORITE', 'APPOINTMENT'],
       default: 'SYSTEM',
     },
     link: {
